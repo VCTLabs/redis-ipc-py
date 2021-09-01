@@ -2,6 +2,8 @@
  redis-ipc-py
 ==============
 
+A small python module implementing redis-ipc concepts.
+
 |ci| |pylint| |bandit| |cov| |python|
 
 |tag| |license| |style|
