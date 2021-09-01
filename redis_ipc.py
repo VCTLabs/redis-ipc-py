@@ -1,11 +1,18 @@
-""""
-This is a Python module to provide client access to the Redis server.
+# Copyright (c) 2011-2021 Vanguard Computer Technology Labs <answers@vctlabs.com>
+#
+# SPDX-License-Identifier: GPL-2.0-or-later
+"""
+This is a Python module to provide client/server classes to send/receive
+messages to/from a running Redis server.
 """
 
 import os
 import time
 import json
 import redis
+
+
+__version__ = '0.0.0.dev0'
 
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()

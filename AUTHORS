@@ -1,9 +1,9 @@
-Authors of redis-ipc
+Authors of redis-ipc-py
 
 Stephanie Lockwood-Childs <sjl@vctlabs.com>
 
- - pretty much everything
+N Lockwood <nll@vctlabs.com>
 
-Stephen Arnold <sarnold@vctlabs.com>
+Steve Arnold <nerdboy@gentoo.org>
 
- - occasional build fixes and autotools port
+ - tools, packaging, lint cleanup
