@@ -2,10 +2,11 @@ name: Security check - Bandit
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "*" ]
   pull_request:
-    branches: [ "*" ]
+  push:
+    branches:
+      - master
+      - develop
 
 jobs:
   build:

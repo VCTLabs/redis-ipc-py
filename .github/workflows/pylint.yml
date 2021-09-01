@@ -4,7 +4,9 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: [ master, develop ]
+    branches:
+      - master
+      - develop
 
 jobs:
   pylint:
