@@ -4,9 +4,9 @@
 
 A small python module implementing redis-ipc concepts.
 
-|ci| |pylint| |bandit| |cov| |python|
+|ci| |pylint| |bandit| |cov|
 
-|tag| |license| |style|
+|python| |tag| |license| |style|
 
 redis-ipc is an example of how redis_ can be used as an advanced IPC 
 mechanism on an embedded Linux system, for instance as a substitute for the
@@ -107,28 +107,28 @@ remember to specify the socket path when running redis-cli ::
 .. _redis: http://redis.io/
 
 
-.. |ci| image:: https://github.com/VCTLabs/redis-ipc/actions/workflows/smoke.yml/badge.svg
-    :target: https://github.com/VCTLabs/redis-ipc/actions/workflows/smoke.yml
+.. |ci| image:: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/ci.yml/badge.svg
+    :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/ci.yml
     :alt: GitHub CI Smoke Test Status
 
-.. |pylint| image:: https://github.com/VCTLabs/redis-ipc/actions/workflows/pylint.yml/badge.svg
-    :target: https://github.com/VCTLabs/redis-ipc/actions/workflows/pylint.yml
+.. |pylint| image:: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml/badge.svg
+    :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml
     :alt: GitHub CI Pylint Status
 
-.. |cov| image:: https://img.shields.io/codecov/c/github/VCTLabs/redis-ipc
-    :target: https://codecov.io/gh/VCTLabs/redis-ipc
+.. |cov| image:: https://img.shields.io/codecov/c/github/VCTLabs/redis-ipc-py
+    :target: https://codecov.io/gh/VCTLabs/redis-ipc-py
     :alt: Codecov test coverage
 
-.. |bandit| image:: https://github.com/VCTLabs/redis-ipc/actions/workflows/bandit.yml/badge.svg
-    :target: https://github.com/VCTLabs/redis-ipc/actions/workflows/bandit.yml
+.. |bandit| image:: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/bandit.yml/badge.svg
+    :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/bandit.yml
     :alt: Security check - Bandit
 
 .. |license| image:: https://badges.frapsoft.com/os/gpl/gpl.png?v=103
     :target: https://opensource.org/licenses/GPL-2.0/
     :alt: License
 
-.. |tag| image:: https://img.shields.io/github/v/tag/VCTLabs/redis-ipc?color=green&include_prereleases&label=latest%20release
-    :target: https://github.com/VCTLabs/redis-ipc/releases
+.. |tag| image:: https://img.shields.io/github/v/tag/VCTLabs/redis-ipc-py?color=green&include_prereleases&label=latest%20release
+    :target: https://github.com/VCTLabs/redis-ipc-py/releases
     :alt: GitHub tag (latest SemVer, including pre-release)
 
 .. |python| image:: https://img.shields.io/badge/python-3.6+-blue.svg
