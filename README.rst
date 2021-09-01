@@ -59,17 +59,17 @@ the tests (including style checkers and test coverage).
   $ tox -e pyNN-<platform>
 
 where NN is the 2-digit python version installed in your desktop environment
-and `<platform>` is either `linux` or `macos`.  For example::
+and ``<platform>`` is either ``linux`` or ``macos``.  For example::
 
   $ tox -e py38-linux
 
 The above will run the `nose` test driver and generate/display test coverage
 data.  Other tox environment arguments you can pass include:
 
-* `tox -e build` will build the python packages and run package checks
-* `tox -e style` will run the `flake8` and `pycodestyle` (PEP8) style checks
-* `tox -e lint` will run pylint (somewhat less permissive than PEP8/flake8 checks)
-* `tox -e dev` will install in developer mode and run pytest/flake8/coverage
+* ``tox -e build`` will build the python packages and run package checks
+* ``tox -e style`` will run the ``flake8`` and ``pycodestyle`` (PEP8) style checks
+* ``tox -e lint`` will run pylint (somewhat less permissive than PEP8/flake8 checks)
+* ``tox -e dev`` will install in developer mode and run pytest/flake8/coverage
 
 
 Standards and Coding Style
@@ -84,9 +84,9 @@ redis_ipc.py
 ============
 
 A python module implementation of redis-ipc client/server classes.  Requires
-`redis-py` and a running `redis` server.  From the repository directory, you
+``redis-py`` and a running ``redis`` server.  From the repository directory, you
 should either add "." to your PYTHON_PATH or copy the python module to
-`site-packages`.
+``site-packages``.
 
 To start a local redis server first, run the following *before* you start
 the python interpreter::
