@@ -30,6 +30,56 @@ a more detailed description.
 .. _redis-ipc C library: https://github.com/VCTLabs/redis-ipc
 
 
+Quick Start Dev Environment
+===========================
+
+As there are not any Pypi packages available yet, you'll need to first
+clone this reposiory and then install locally (see below).
+
+.. note:: All dependencies are optional except `redis-py`.
+
+.. _tox: https://github.com/tox-dev/tox
+
+
+Dev Install
+-----------
+
+As long as you have git and at least Python 3.6, then the "easy" dev
+install is to clone this repository and install `tox`_.
+
+After cloning the repository, you can run the current tests with the
+``tox`` command.  It will build a virtual python environment for each
+installed version of python with all the python dependencies and run
+the tests (including style checkers and test coverage).
+
+::
+
+  $ git clone https://github.com/VCTLabs/redis-ipc-py
+  $ cd redis-ipc-py
+  $ tox -e pyNN-<platform>
+
+where NN is the 2-digit python version installed in your desktop environment
+and `<platform>` is either `linux` or `macos`.  For example::
+
+  $ tox -e py38-linux
+
+The above will run the `nose` test driver and generate/display test coverage
+data.  Other tox environment arguments you can pass include:
+
+* `tox -e build` will build the python packages and run package checks
+* `tox -e style` will run the `flake8` and `pycodestyle` (PEP8) style checks
+* `tox -e lint` will run pylint (somewhat less permissive than PEP8/flake8 checks)
+* `tox -e dev` will install in developer mode and run pytest/flake8/coverage
+
+
+Standards and Coding Style
+--------------------------
+
+Both pep8 and flake8 are part of the above test suite.  There are also
+some CI pylint and bandit code analysis checks for complexity and security
+issues (we try to keep the "cognitive complexity" low when possible).
+
+
 redis_ipc.py
 ============
 
