@@ -7,8 +7,11 @@ from redis_ipc import RedisClient as rc
 
 import pytest
 
+
+# common data
 components = ['printer']
 channels = ['main', 'debug']
+
 
 def echo_msg():
     """ Simple message bus listener to echo the result msg  """
