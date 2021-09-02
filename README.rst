@@ -114,6 +114,7 @@ the python interpreter::
 
   $ mkdir /tmp/redis-ipc
   $ redis-server --port 0 --pidfile /tmp/redis.pid --unixsocket /tmp/redis-ipc/socket --unixsocketperm 600 &
+  $ redis-cli -s /tmp/redis-ipc/socket config set save ""  # disable dump.rdb saving
 
 The above command will use your local temp directory and permissions for the
 socket and PID files, and setting the ``port`` to zero disables listening on
