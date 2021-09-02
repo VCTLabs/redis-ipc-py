@@ -80,34 +80,51 @@ some CI pylint and bandit code analysis checks for complexity and security
 issues (we try to keep the "cognitive complexity" low when possible).
 
 
-redis_ipc.py
-============
+Usage Example
+=============
 
-A python module implementation of redis-ipc client/server classes.  Requires
-``redis-py`` and a running ``redis`` server.  From the repository directory, you
-should either add "." to your PYTHON_PATH or copy the python module to
-``site-packages``.
+This repository contains a python module implementation of redis-ipc client/server
+classes, and requires ``redis-py`` and a running ``redis`` server for full
+functionality. The easiest way to get started is really just "Try it and see..."
+so you'll need to install and start a redis server first.
+
+Using your system package manager, install the redis server package for your
+platform:
+
+* on Gentoo: ``sudo emerge redis``
+* on Ubuntu: ``sudo apt-get install redis-server``
+* on CentOS::
+
+    sudo yum install epel-release
+    sudo yum update
+    sudo yum install redis
+
+On almost everything except Gentoo you should stop the system service
+before proceeding::
+
+  sudo systemctl stop redis
+
+
+From the repository directory, you should either add "." to your PYTHON_PATH
+or copy the python module to ``site-packages``; for this example you can use
+the command shown below.
 
 To start a local redis server first, run the following *before* you start
 the python interpreter::
 
-    $ redis-server --port 0 --pidfile /tmp/redis.pid --unixsocket /tmp/redis-ipc/socket --unixsocketperm 600 &
+  $ mkdir /tmp/redis-ipc
+  $ redis-server --port 0 --pidfile /tmp/redis.pid --unixsocket /tmp/redis-ipc/socket --unixsocketperm 600 &
 
-The above will background the redis server, but you may need to hit
+The above command will use your local temp directory and permissions for the
+socket and PID files, and setting the ``port`` to zero disables listening on
+any network interfaces.
+
+The above will also background the redis server, but you may need to hit
 <Enter> once to get the prompt back. Then type `python` in the source
 directory in *2 separate terminal windows* and continue below.
 
-For example, to run from the source directory, start a server from the
-first terminal::
-
-    >>> import sys
-    >>> sys.path.append('.')
-    >>> from redis_ipc import RedisServer as rs
-    >>> myServer = rs("my_component")
-    >>> result = myServer.redis_ipc_receive_command()  # doctest: +SKIP
-    >>> myServer.redis_ipc_send_reply(result, result)  # doctest: +SKIP
-
-Then from a second terminal, start a client::
+For example, to run from the source directory, start a client process from
+the first terminal::
 
     >>> import sys
     >>> sys.path.append('.')
@@ -116,9 +133,19 @@ Then from a second terminal, start a client::
     >>> myClient.redis_ipc_send_and_receive("my_component", {}, 30)  # doctest: +SKIP
     {'timestamp': '1627166512.0108066', 'component': 'my_component', 'thread': 'main', 'tid': 24544, 'results_queue': 'queues.results.my_component.main', 'command_id': 'my_component:24544:1627166512.0108066'}
 
+Then from a second terminal, start a server process::
 
-Note that both of the above will block for the timeout period (30 sec in
-this example) if they're waiting for the other side to send/reply.
+    >>> import sys
+    >>> sys.path.append('.')
+    >>> from redis_ipc import RedisServer as rs
+    >>> myServer = rs("my_component")
+    >>> result = myServer.redis_ipc_receive_command()  # doctest: +SKIP
+    >>> myServer.redis_ipc_send_reply(result, result)  # doctest: +SKIP
+
+
+Note that client side of the above will block for the timeout period (30 sec in
+this example) while waiting for the other side to send/reply, so run the server
+commands in less than 30 sec. or increase the timeout value on the client.
 
 If there is no running redis server, then you will get the following::
 
@@ -136,8 +163,8 @@ When finished with the above, don't forget to kill the redis server::
     $ cat /tmp/redis.pid | xargs kill
 
 
-Testing/troubleshooting with redis-ipc
-======================================
+Testing | Troubleshooting
+=========================
 
 One of the great features of using redis for system-wide IPC is the ability
 to watch the interactions between components using the **monitor** command
