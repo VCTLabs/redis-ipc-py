@@ -63,13 +63,18 @@ and ``<platform>`` is either ``linux`` or ``macos``.  For example::
 
   $ tox -e py38-linux
 
-The above will run the `nose` test driver and generate/display test coverage
-data.  Other tox environment arguments you can pass include:
+The above will run the default tox testenv, which includes the following:
+
+* pre_test - install locally via ``pip`` and start the redis server
+* test - run the simple msg bus send/receive tests with coverage
+* post_test - stop the redis server
+
+Other tox environment arguments you can pass include:
 
 * ``tox -e build`` will build the python packages and run package checks
 * ``tox -e style`` will run the ``flake8`` and ``pycodestyle`` (PEP8) style checks
 * ``tox -e lint`` will run pylint (somewhat less permissive than PEP8/flake8 checks)
-* ``tox -e dev`` will install in developer mode and run pytest/flake8/coverage
+* ``tox -e noredis`` will run the legacy doctests
 
 
 Standards and Coding Style
