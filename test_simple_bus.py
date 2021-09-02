@@ -1,6 +1,7 @@
 from multiprocessing import Process
 
-from redis_ipc import RedisIpcExc
+import redis_ipc
+
 from redis_ipc import RedisServer as rs
 from redis_ipc import RedisClient as rc
 
@@ -30,7 +31,6 @@ def test_ipc_send_receive():
     # Test
     res = client.redis_ipc_send_and_receive(components[0], {}, 1)
 
-    print(res)
     assert isinstance(res, dict)
     assert res["component"] == components[0]
     assert res["thread"] == channels[0]
@@ -38,5 +38,6 @@ def test_ipc_send_receive():
 
     printer1_dbg = rc(components[0], channels[1])
 
-    with pytest.raises(RedisIpcExc):
+    with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         res_dbg = printer1_dbg.redis_ipc_send_and_receive(components[0], {}, 1)
+    assert "redis message request timed out" in str(excinfo.value)
