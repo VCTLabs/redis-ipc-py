@@ -1,23 +1,25 @@
-#! /bin/sh
+#!/usr/bin/env bash
 #
 # this runs a local redis-server and accepts start|stop|status args;
 # we use this in tox pre/post commands to run tests that require
 # a redis server listening on the redis-ipc socket
 # note: the default command is status
 
+set -euo pipefail
 
 failures=0
 trap 'failures=$((failures+1))' ERR
 
 CMD_ARG=${1:-status}
+VERBOSE="false"  # set to "true" for extra output
 
 if [[ "${CMD_ARG}" = "status" ]]; then
-    [[ -n $VERBOSE ]]  && echo "pinging redis-server on local socket..."
+    [[ "${VERBOSE}" = "true" ]]  && echo "pinging redis-server on local socket..."
     redis-cli -s /tmp/redis-ipc/socket ping
 fi
 
 if [[ "${CMD_ARG}" = "start" ]]; then
-    [[ -n $VERBOSE ]]  && echo "starting redis-server on local socket..."
+    [[ "${VERBOSE}" = "true" ]]  && echo "starting redis-server on local socket..."
     mkdir -p /tmp/redis-ipc/
     redis-server --port 0 --pidfile /tmp/redis.pid --unixsocket /tmp/redis-ipc/socket --unixsocketperm 600 &
     sleep 1
@@ -25,7 +27,7 @@ if [[ "${CMD_ARG}" = "start" ]]; then
 fi
 
 if [[ "${CMD_ARG}" = "stop" ]]; then
-    [[ -n $VERBOSE ]]  && echo "killing redis-server on local socket in 1 sec..."
+    [[ "${VERBOSE}" = "true" ]]  && echo "killing redis-server on local socket in 1 sec..."
     sleep 1
     cat /tmp/redis.pid | xargs kill
 fi
