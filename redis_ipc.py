@@ -229,7 +229,7 @@ class RedisServer():
         # tie reply to its command with matching command_id
         result["command_id"] = cmd["command_id"]
 
-        # turn command into a JSON dictionary before sending it
+        # turn result into a JSON string before sending it
         msg = pdic2jdic(result)
 
         # send it via Redis
