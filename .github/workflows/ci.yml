@@ -63,6 +63,7 @@ jobs:
         fail_ci_if_error: true
         name: codecov-umbrella
         verbose: true
+        files: ./coverage.xml
 
     - name: Build sdist/wheel
       run: |
