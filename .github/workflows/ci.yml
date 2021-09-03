@@ -57,9 +57,8 @@ jobs:
         PLATFORM: ${{ matrix.os }}
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v1
       with:
-        verbose: true
         env_vars: OS,PYTHON
 
     - name: Build sdist/wheel
