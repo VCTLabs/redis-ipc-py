@@ -56,18 +56,18 @@ the tests (including style checkers and test coverage).
 
   $ git clone https://github.com/VCTLabs/redis-ipc-py
   $ cd redis-ipc-py
-  $ tox -e pyNN-<platform>
-
-where NN is the 2-digit python version installed in your desktop environment
-and ``<platform>`` is either ``linux`` or ``macos``.  For example::
-
-  $ tox -e py38-linux
+  $ tox -e tests
 
 The above will run the default tox testenv, which includes the following:
 
-* pre_test - install locally via ``pip`` and start the redis server
+* pre_test - install in tox env via ``pip`` and start the redis server
 * test - run the simple msg bus send/receive tests with coverage
 * post_test - stop the redis server
+
+.. important:: The command above **requires** the installation of the full
+  ``redis`` package (or at least ``redis-server``).  See the `Usage Example`_
+  below for install instructions; you can still run the other tox commands
+  without a full ``redis`` install.
 
 Other tox environment arguments you can pass include:
 
@@ -113,6 +113,21 @@ before proceeding::
 From the repository directory, you should either add "." to your PYTHON_PATH
 or copy the python module to ``site-packages``; for this example you can use
 the command shown below.
+
+Testing With Tox
+----------------
+
+Once you have a ``redis-server`` installed, you can simply run the above
+``tox`` command to manage the redis server component and run the tests, eg::
+
+  $ tox -e tests
+
+The following section illustrates the (approximate) manual test steps run
+by the above command.
+
+
+Manual Testing Steps
+--------------------
 
 To start a local redis server first, run the following *before* you start
 the python interpreter::
