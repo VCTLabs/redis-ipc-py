@@ -11,17 +11,19 @@ coverage:
     changes: no
 
   precision: 2
-  round: nearst
+  round: nearest
   range: 80...100
 
   notify:
     irc:
       default:
-        server: irc.libera.chat
+        server: "irc.libera.chat"
         channel: '##code-hell'
-        branches: master, develop
-        threshold: 2
-        message: null
+        branches: null  # all branches by default
+        threshold: 1%
+        message: "Coverage {{changed}} for {{owner}}/{{repo}}"  # customize the message
+        flags: null
+        paths: null
 
 ignore:
  - "scripts/.*"
