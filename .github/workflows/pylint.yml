@@ -35,4 +35,4 @@ jobs:
 
     - name: Run doctests
       run: |
-        tox -e py38-linux
+        tox -e noredis
