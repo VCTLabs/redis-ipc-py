@@ -56,14 +56,21 @@ jobs:
       env:
         PLATFORM: ${{ matrix.os }}
 
-    - name: Upload coverage to Codecov
-      uses: "codecov/codecov-action@v2.0.2"
+    - name: Code Coverage Summary Report
+      if: runner.os == 'Linux'
+      uses: irongut/CodeCoverageSummary@v1.0.1
       with:
-        env_vars: OS,PYTHON
-        fail_ci_if_error: true
-        name: codecov-umbrella
-        verbose: true
-        files: ./coverage.xml
+        filename: coverage.xml
+        badge: true
+        format: 'markdown'
+        output: 'both'
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2.1.0
+      if: github.event_name == 'push' || github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
 
     - name: Build sdist/wheel
       run: |
