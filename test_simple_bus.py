@@ -18,7 +18,8 @@ def echo_msg():
 
     listener = rs(component=components[0])
     result = listener.redis_ipc_receive_command()
-    listener.redis_ipc_send_reply(result, result)
+    reply = result  # echo
+    listener.redis_ipc_send_reply(result, reply)
 
 
 def test_ipc_send_receive():

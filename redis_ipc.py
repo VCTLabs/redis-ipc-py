@@ -2,8 +2,9 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 """
-This is a Python module to provide client/server classes to send/receive
-messages to/from a running Redis server.
+This is a Python module to provide 'thin' client/server classes implementing
+a light-weight IPC mechanism using JSON formatting and the Redis server as
+'message bus'.
 """
 
 import os
