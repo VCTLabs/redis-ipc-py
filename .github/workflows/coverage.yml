@@ -1,0 +1,228 @@
+name: Coverage
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+
+jobs:
+  pre_ci:
+    name: Prepare CI environment
+    runs-on: ubuntu-20.04
+    outputs:
+      commit_message: ${{ steps.get_commit_message.outputs.commit_message }}
+      branch: ${{ steps.extract_branch.outputs.branch }}
+
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+      with:
+        # We need to fetch with a depth of 2 for pull_request so we can do HEAD^2
+        fetch-depth: 2
+
+    - name: "Get commit message"
+      id: get_commit_message
+      env:
+        COMMIT_PUSH: ${{ github.event.head_commit.message }}
+      run: |
+        COMMIT_MESSAGE="${COMMIT_PUSH:-$(git log --format=%B -n 1 HEAD^2)}"
+        echo "::set-output name=commit_message::${COMMIT_MESSAGE}"
+
+    - name: Extract branch name
+      id: extract_branch
+      shell: bash
+      run: |
+        TMP_PULL_HEAD_REF="${{ github.head_ref }}"
+        TMP_GITHUB_REF="${GITHUB_REF#refs/heads/}"
+        EXPORT_VALUE=""
+        if [ "${TMP_PULL_HEAD_REF}" != "" ]
+        then
+            EXPORT_VALUE="${TMP_PULL_HEAD_REF}"
+        else
+            EXPORT_VALUE="${TMP_GITHUB_REF}"
+        fi
+        echo "##[set-output name=branch;]${EXPORT_VALUE}"
+
+  cov_data:
+    name: Generate test coverage data
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      coverage: ${{ steps.coverage.outputs.coverage }}
+      coverage-rounded-display: ${{ steps.coverage.outputs.coverage-rounded-display }}
+    env:
+      PYTHONIOENCODING: utf-8
+      PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install redis (ubuntu)
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get install -yqq redis-server
+
+    - name: Add python requirements
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox
+
+    - name: Generate coverage and fix pkg name
+      # another workaround for coverage.py missing package name
+      run: |
+        tox -e py38-cov-linux
+        ./scripts/fix_pkg_name.sh
+
+    - name: Code Coverage Summary Report (Text & Value)
+      uses: irongut/CodeCoverageSummary@v1.0.1
+      with:
+        filename: coverage.xml
+        output: both
+
+    - name: Check code coverage
+      id: coverage
+      env:
+        VALUE: "Branch Rate"
+      run: |
+        COVERAGE="$( cat code-coverage-results.txt | egrep "^${VALUE}" | sed -e 's#^.* \([0-9]*\)%.*#\1#' )"
+        echo "##[set-output name=coverage;]${COVERAGE}"
+        echo "##[set-output name=coverage-rounded-display;]${COVERAGE}%"
+
+    - name: Code Coverage Summary Report (Markdown)
+      uses: irongut/CodeCoverageSummary@v1.0.1
+      if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+      with:
+        filename: coverage.xml
+        output: file
+        format: markdown
+        badge: false
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2.1.0
+      if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+      with:
+        recreate: true
+        path: code-coverage-results.md
+
+  test:
+    name: Coverage check
+    runs-on: ubuntu-20.04
+    needs: [cov_data]
+    outputs:
+      coverage: ${{ needs.cov_data.outputs.coverage }}
+      coverage-rounded-display: ${{ needs.cov_data.outputs.coverage-rounded-display }}
+
+    steps:
+    - name: Check test coverage
+      env:
+        COVERAGE: ${{ needs.cov_data.outputs.coverage }}
+        COVERAGE_ROUNDED: ${{ needs.cov_data.outputs.coverage-rounded-display }}
+      run: |
+        echo "Coverage: ${COVERAGE}"
+        echo "Coverage Rounded: ${COVERAGE_ROUNDED}"
+
+  badge:
+    # Only generate and publish if these conditions are met:
+    # - The test step ended successfully
+    # - One of these is met:
+    #   - This is a pull request event and the pull actor is the same as the repo owner
+    #   - This is a push event and the push event is on branch 'master'
+    name: Generate badge image with test coverage value
+    runs-on: ubuntu-20.04
+    needs: [test, pre_ci]
+    if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/master' }}
+    outputs:
+      url: ${{ steps.url.outputs.url }}
+      markdown: ${{ steps.url.outputs.markdown }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: badges
+        path: badges
+
+    # Use the output from the `coverage` step
+    - name: Generate the badge SVG image
+      uses: emibcn/badge-action@v1
+      id: badge
+      with:
+        label: 'Coverage'
+        status: ${{ needs.test.outputs.coverage-rounded-display }}
+        color: ${{
+          needs.test.outputs.coverage > 90 && 'green'              ||
+          needs.test.outputs.coverage > 80 && 'yellow,green'       ||
+          needs.test.outputs.coverage > 70 && 'yellow'             ||
+          needs.test.outputs.coverage > 60 && 'orange,yellow'      ||
+          needs.test.outputs.coverage > 50 && 'orange'             ||
+          needs.test.outputs.coverage > 40 && 'red,orange'         ||
+          needs.test.outputs.coverage > 30 && 'red,red,orange'     ||
+          needs.test.outputs.coverage > 20 && 'red,red,red,orange' ||
+          'red' }}
+        path: badges/test-coverage.svg
+
+    - name: Commit badge
+      env:
+        BRANCH: ${{ needs.pre_ci.outputs.branch }}
+        FILE: 'test-coverage.svg'
+      working-directory: ./badges
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        mkdir -p "${BRANCH}"
+        mv "${FILE}" "${BRANCH}"
+        git add "${BRANCH}/${FILE}"
+        # Will give error if badge did not changed
+        git commit -m "Add/Update badge" || true
+
+    - name: Push badge commit
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: badges
+        directory: badges
+
+    - name: Badge image URL
+      id: url
+      env:
+        BRANCH: ${{ needs.pre_ci.outputs.branch }}
+        FILE: 'test-coverage.svg'
+        COVERAGE: ${{ needs.test.outputs.coverage-rounded-display }}
+      run: |
+        URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/badges/${BRANCH}/${FILE}"
+        MARKDOWN="![Coverage ${COVERAGE}](${URL})"
+        echo "Badge URL: ${URL}"
+        echo "Badge image for Markdown: ${MARKDOWN}"
+        echo "##[set-output name=url;]${URL}"
+        echo "##[set-output name=markdown;]${MARKDOWN}"
+
+  comment_pr_badge:
+    name: Comment on PR with generated badge
+    runs-on: ubuntu-20.04
+    needs: [pre_ci, badge]
+    if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+
+    steps:
+    - name: Generate comment file with test coverage badge
+      shell: bash
+      env:
+        BADGE: ${{ needs.badge.outputs.markdown }}
+      run: |
+        echo "Badge: ${BADGE}"
+        echo "${BADGE}" > output.md
+
+    - name: Comment PR with test coverage badge
+      uses: marocchino/sticky-pull-request-comment@v2.1.0
+      with:
+        recreate: true
+        path: output.md

@@ -51,30 +51,10 @@ jobs:
         pip install tox tox-gh-actions
 
     - name: Run tests
-      # another workaround for coverage.py missing package name
       run: |
         tox
-        ./scripts/fix_pkg_name.sh
       env:
         PLATFORM: ${{ matrix.os }}
-
-    - name: Code Coverage Summary Report
-      if: runner.os == 'Linux' && matrix.python-version == '3.9'
-      # use the fixed markdown until new upstream release
-      # uses: irongut/CodeCoverageSummary@v1.0.1
-      uses: joshjohanning/CodeCoverageSummary@v1.0.2
-      with:
-        filename: coverage.xml
-        badge: true
-        format: 'markdown'
-        output: 'both'
-
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2.1.0
-      if: github.event_name == 'pull_request' && runner.os == 'Linux' && matrix.python-version == '3.9'
-      with:
-        recreate: true
-        path: code-coverage-results.md
 
     - name: Build sdist/wheel
       run: |
