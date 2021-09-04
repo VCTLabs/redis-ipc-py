@@ -51,8 +51,10 @@ jobs:
         pip install tox tox-gh-actions
 
     - name: Run tests
+      # another workaround for coverage.py missing package name
       run: |
         tox
+        ./scripts/fix_pkg_name.sh
       env:
         PLATFORM: ${{ matrix.os }}
 
