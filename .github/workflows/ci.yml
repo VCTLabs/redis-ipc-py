@@ -58,7 +58,9 @@ jobs:
 
     - name: Code Coverage Summary Report
       if: runner.os == 'Linux' && matrix.python-version == '3.9'
-      uses: irongut/CodeCoverageSummary@v1.0.1
+      # use the fixed markdown until new upstream release
+      # uses: irongut/CodeCoverageSummary@v1.0.1
+      uses: joshjohanning/CodeCoverageSummary@v1.0.2
       with:
         filename: coverage.xml
         badge: true
