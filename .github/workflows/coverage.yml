@@ -46,9 +46,27 @@ jobs:
         fi
         echo "##[set-output name=branch;]${EXPORT_VALUE}"
 
+  check:
+    name: Pre CI check
+    runs-on: ubuntu-20.04
+    needs: [pre_ci]
+    outputs:
+      message: ${{ needs.pre_ci.outputs.commit_message }}
+      branch: ${{ needs.pre_ci.outputs.branch }}
+
+    steps:
+    - name: Check github variables
+      env:
+        COMMIT_MESSAGE: ${{ needs.pre_ci.outputs.commit_message }}
+        EXPORT_VALUE: ${{ needs.pre_ci.outputs.branch }}
+      run: |
+        echo "Commit message: ${COMMIT_MESSAGE}"
+        echo "Export value (github ref): ${EXPORT_VALUE}"
+
   cov_data:
     name: Generate test coverage data
     runs-on: ubuntu-20.04
+    needs: [check]
     defaults:
       run:
         shell: bash
