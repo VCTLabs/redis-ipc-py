@@ -93,7 +93,7 @@ jobs:
     - name: Check code coverage
       id: coverage
       env:
-        VALUE: "Branch Rate"
+        VALUE: "Line Rate"
       run: |
         COVERAGE="$( cat code-coverage-results.txt | egrep "^${VALUE}" | sed -e 's#^.* \([0-9]*\)%.*#\1#' )"
         echo "##[set-output name=coverage;]${COVERAGE}"
@@ -101,7 +101,7 @@ jobs:
 
     - name: Code Coverage Summary Report (Markdown)
       uses: irongut/CodeCoverageSummary@v1.0.1
-      if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+      if: ${{ github.event_name == 'pull_request' }}
       with:
         filename: coverage.xml
         output: file
@@ -110,7 +110,7 @@ jobs:
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2.1.0
-      if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+      if: ${{ github.event_name == 'pull_request' }}
       with:
         recreate: true
         path: code-coverage-results.md
@@ -141,7 +141,7 @@ jobs:
     name: Generate badge image with test coverage value
     runs-on: ubuntu-20.04
     needs: [test, pre_ci]
-    if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/master' }}
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' }}
     outputs:
       url: ${{ steps.url.outputs.url }}
       markdown: ${{ steps.url.outputs.markdown }}
@@ -210,7 +210,7 @@ jobs:
     name: Comment on PR with generated badge
     runs-on: ubuntu-20.04
     needs: [pre_ci, badge]
-    if: ${{ github.event_name == 'pull_request' && github.actor == github.repository_owner }}
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' }}
 
     steps:
     - name: Generate comment file with test coverage badge
