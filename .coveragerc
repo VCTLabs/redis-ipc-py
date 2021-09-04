@@ -1,11 +1,10 @@
 # .coveragerc to control coverage.py
 [run]
-#branch = True
+branch = True
 
 omit =
     .tox/*
     setup.py
-    tests/*
     test_simple_bus.py
 
 plugins =
@@ -14,6 +13,9 @@ plugins =
 [report]
 # must set this to True to see missing
 #show_missing = True
+
+# explicitly setting include for source file does NOT fix name="."
+include = redis_ipc.py
 
 # Regexes for lines to exclude from consideration
 exclude_lines =
