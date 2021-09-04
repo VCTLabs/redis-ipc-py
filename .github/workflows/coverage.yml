@@ -50,9 +50,6 @@ jobs:
     name: Pre CI check
     runs-on: ubuntu-20.04
     needs: [pre_ci]
-    outputs:
-      message: ${{ needs.pre_ci.outputs.commit_message }}
-      branch: ${{ needs.pre_ci.outputs.branch }}
 
     steps:
     - name: Check github variables
