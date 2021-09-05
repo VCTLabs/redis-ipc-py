@@ -23,6 +23,10 @@ jobs:
         # We need to fetch with a depth of 2 for pull_request so we can do HEAD^2
         fetch-depth: 2
 
+    - name: Environment
+      run: |
+        bash -c set
+
     - name: "Get commit message"
       id: get_commit_message
       env:
@@ -154,12 +158,16 @@ jobs:
     # Only generate and publish if these conditions are met:
     # - The test step ended successfully
     # - One of these is met:
-    #   - This is a push event and the push event is on branch 'master'
-    #   - This is a push event and the push event is on branch 'develop'
+    #   - This is a push event and the push event is on branch 'master' or 'develop'
+    # Note: if this repo is personal (ie, not an org repo) then you can
+    #       use the following to change the scope of the next 2 jobs
+    #       instead of running on branch push as shown below:
+    #   - This is a pull request event and the pull actor is the same as the repo owner
+    #     if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/master' }}
     name: Generate badge image with test coverage value
     runs-on: ubuntu-20.04
     needs: [test, pre_ci]
-    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' }}
+    if: ${{ github.event_name == 'push' }}
     outputs:
       url: ${{ steps.url.outputs.url }}
       markdown: ${{ steps.url.outputs.markdown }}
@@ -228,7 +236,7 @@ jobs:
     name: Comment on PR with generated badge
     runs-on: ubuntu-20.04
     needs: [pre_ci, badge]
-    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop' }}
+    if: ${{ github.event_name == 'push' }}
 
     steps:
     - name: Generate comment file with test coverage badge
