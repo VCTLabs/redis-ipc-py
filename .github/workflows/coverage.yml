@@ -50,19 +50,62 @@ jobs:
         fi
         echo "##[set-output name=branch;]${EXPORT_VALUE}"
 
+  base:
+    name: Base coverage
+    runs-on: ubuntu-20.04
+    outputs:
+      base_branch: ${{ steps.get_base.outputs.base_branch }}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: badges
+        path: badges
+
+    - name: Get base ref and coverage score
+      id: get_base
+      env:
+        FILE: 'test-coverage.txt'
+      working-directory: ./badges
+      shell: bash
+      run: |
+        TMP_PULL_HEAD_REF="${{ github.base_ref }}"
+        TMP_GITHUB_REF="${GITHUB_REF#refs/heads/}"
+        EXPORT_VALUE=""
+        if [ "${TMP_PULL_HEAD_REF}" != "" ]
+        then
+            EXPORT_VALUE="${TMP_PULL_HEAD_REF}"
+        else
+            EXPORT_VALUE="${TMP_GITHUB_REF}"
+        fi
+        echo "##[set-output name=base_branch;]${EXPORT_VALUE}"
+        if [ -f "${EXPORT_VALUE}/${FILE}" ]
+        then
+            echo "Base coverage found on ${EXPORT_VALUE}"
+            BASE_COV=$(cat "${EXPORT_VALUE}/${FILE}")
+            echo "Base coverage is: ${BASE_COV}"
+        else
+            echo "Base coverage NOT found on ${EXPORT_VALUE}!!"
+        fi
+        echo "BASE_COVERAGE=${BASE_COV}" >> $GITHUB_ENV
+
   check:
     name: Pre CI check
     runs-on: ubuntu-20.04
-    needs: [pre_ci]
+    needs: [pre_ci, base]
 
     steps:
     - name: Check github variables
+      # NOTE base coverage env var may be empty here
       env:
         COMMIT_MESSAGE: ${{ needs.pre_ci.outputs.commit_message }}
         EXPORT_VALUE: ${{ needs.pre_ci.outputs.branch }}
+        BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
       run: |
         echo "Commit message: ${COMMIT_MESSAGE}"
-        echo "Export value (github ref): ${EXPORT_VALUE}"
+        echo "Export value (head_ref): ${EXPORT_VALUE}"
+        echo "Base value (base_ref): ${BASE_BRANCH}"
+        echo "Base coverage (percent): ${{ env.BASE_COVERAGE }}"
 
   cov_data:
     name: Generate test coverage data
@@ -153,6 +196,63 @@ jobs:
       run: |
         echo "Coverage: ${COVERAGE}"
         echo "Coverage Rounded: ${COVERAGE_ROUNDED}"
+        echo "Coverage on Base Branch: ${{ env.BASE_COVERAGE }}"
+
+  comment_cov_change:
+    name: Comment on PR with coverage delta
+    runs-on: ubuntu-20.04
+    needs: [test, base]
+
+    steps:
+    - name: Set whether base coverage was found
+      shell: bash
+      env:
+        BASE: ${{ env.BASE_COVERAGE }}
+      run: |
+        if [ -n "${BASE}" ]
+        then
+            BASE_RESULT="true"
+        else
+            BASE_RESULT="false"
+        fi
+        echo "HAVE_BASE_COVERAGE=${BASE_RESULT}" >> $GITHUB_ENV
+
+    - name: Collect variables and construct comment for delta message
+      if: env.HAVE_BASE_COVERAGE == 'true'
+      shell: bash
+      env:
+        BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
+        COVERAGE: ${{ needs.test.outputs.coverage }}
+        BASE_COVERAGE: ${{ env.BASE_COVERAGE }}
+        DELTA_WORD: ${{
+          needs.test.outputs.coverage > env.BASE_COVERAGE && 'increase' ||
+          needs.test.outputs.coverage < env.BASE_COVERAGE && 'decrease' ||
+          'not change' }}
+      run: |
+        (( CHG=BASE_COVERAGE-COVERAGE ))
+        echo "Base percent coverage is ${BASE_COVERAGE}" > coverage-delta.md
+        echo "" >> coverage-delta.md
+        echo "Current percent coverage is ${COVERAGE}" >> coverage-delta.md
+        echo "" >> coverage-delta.md
+        if [ "${CHG}" == "0" ]
+        then
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would ${DELTA_WORD} coverage" >> coverage-delta.md
+        else
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would ${DELTA_WORD} coverage by ${CHG}%" >> coverage-delta.md
+        fi
+        if [ "${DELTA_WORD}" != "decrease" ]
+        then
+            echo "" >> coverage-delta.md
+            echo "Nice work, ${{ env.GITHUB_ACTOR }} :)" >> coverage-delta.md
+        fi
+
+    - name: Comment PR with test coverage delta
+      uses: marocchino/sticky-pull-request-comment@v2.1.0
+      if: env.HAVE_BASE_COVERAGE == 'true'
+      with:
+        header: delta
+        recreate: true
+        path: coverage-delta.md
 
   badge:
     # Only generate and publish if these conditions are met:
@@ -197,18 +297,21 @@ jobs:
           'red' }}
         path: badges/test-coverage.svg
 
-    - name: Commit badge
+    - name: Commit badge and data
       env:
         BRANCH: ${{ needs.pre_ci.outputs.branch }}
+        COVERAGE: ${{ needs.test.outputs.coverage }}
         FILE: 'test-coverage.svg'
+        DATA: 'test-coverage.txt'
       working-directory: ./badges
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         mkdir -p "${BRANCH}"
         mv "${FILE}" "${BRANCH}"
-        git add "${BRANCH}/${FILE}"
-        # Will give error if badge did not changed
+        echo "${COVERAGE}" > "${DATA}"
+        git add "${BRANCH}/${FILE}" "${BRANCH}/${DATA}"
+        # Will give error if badge has not changed
         git commit -m "Add/Update badge" || true
 
     - name: Push badge commit
