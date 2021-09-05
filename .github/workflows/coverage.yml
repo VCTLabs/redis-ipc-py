@@ -215,6 +215,7 @@ jobs:
         else
             BASE_RESULT="false"
         fi
+        echo "HAVE_BASE_COVERAGE is ${BASE_RESULT}"
         echo "HAVE_BASE_COVERAGE=${BASE_RESULT}" >> $GITHUB_ENV
 
     - name: Collect variables and construct comment for delta message
