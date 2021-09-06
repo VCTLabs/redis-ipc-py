@@ -172,7 +172,6 @@ jobs:
       if: ${{ github.event_name == 'pull_request' }}
       with:
         filename: coverage.xml
-        badge: true
         format: 'markdown'
         output: 'both'
 
