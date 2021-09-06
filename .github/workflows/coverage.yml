@@ -149,7 +149,9 @@ jobs:
         ./scripts/fix_pkg_name.sh
 
     - name: Code Coverage Summary Report (Text & Value)
-      uses: irongut/CodeCoverageSummary@v1.0.1
+      # use the fixed markdown until new upstream release
+      # uses: irongut/CodeCoverageSummary@v1.0.1
+      uses: joshjohanning/CodeCoverageSummary@v1.0.2
       with:
         filename: coverage.xml
         output: 'both'
@@ -208,6 +210,10 @@ jobs:
     needs: [test, base]
 
     steps:
+    - name: Environment
+      run: |
+        bash -c set
+
     - name: Set whether base coverage was found
       shell: bash
       env:
@@ -233,12 +239,13 @@ jobs:
           needs.test.outputs.coverage > needs.test.outputs.coverage-base && 'increase' ||
           needs.test.outputs.coverage < needs.test.outputs.coverage-base && 'decrease' ||
           'not change' }}
+        RATE: "Line Rate"
+
       run: |
         (( CHG=BASE_COVERAGE-COVERAGE ))
-        echo "Base percent coverage is ${BASE_COVERAGE}" > coverage-delta.md
-        echo "" >> coverage-delta.md
-        echo "Current percent coverage is ${COVERAGE}" >> coverage-delta.md
-        echo "" >> coverage-delta.md
+        CHG="${CHG/-/}"
+        echo "" > coverage-delta.md
+        echo "Base ${RATE} coverage is ${BASE_COVERAGE}% vs your ${RATE} coverage of ${COVERAGE}%" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would ${DELTA_WORD} coverage" >> coverage-delta.md
@@ -248,7 +255,7 @@ jobs:
         if [ "${DELTA_WORD}" != "decrease" ]
         then
             echo "" >> coverage-delta.md
-            echo "Nice work, ${{ env.GITHUB_ACTOR }} :)" >> coverage-delta.md
+            echo "Nice work, @${{ github.actor }} :)" >> coverage-delta.md
         fi
 
     - name: Comment PR with test coverage delta
