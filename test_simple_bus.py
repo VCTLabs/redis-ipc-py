@@ -34,7 +34,8 @@ msgs_dict = [
 
 bad_things = [
     ("bad", "stuff"),
-    "{\"msg\": \"This is tricky\", \"severity\": float(nan)}",
+    "{\"msg\": \"This is tricky\", \"severity\": float('nan')}",
+    {'msg': ("bad", "stuff"), float('nan'):  float('nan')},
 ]
 
 
@@ -81,7 +82,7 @@ def test_ipc_send_receive():
     assert isinstance(res, dict)
     assert res["component"] == components[0]
     assert res["thread"] == channels[0]
-    proc.terminate()
+    proc.join()
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         res_dbg = printer1_dbg.redis_ipc_send_and_receive(components[0], {}, 1)

@@ -159,7 +159,7 @@ jobs:
     - name: Check code coverage
       id: coverage
       env:
-        VALUE: "Line Rate"
+        VALUE: "Branch Rate"
       run: |
         COVERAGE="$( cat code-coverage-results.txt | egrep "^${VALUE}" | sed -e 's#^.* \([0-9]*\)%.*#\1#' )"
         echo "##[set-output name=coverage;]${COVERAGE}"
@@ -238,7 +238,7 @@ jobs:
           needs.test.outputs.coverage > needs.test.outputs.coverage-base && 'increase' ||
           needs.test.outputs.coverage < needs.test.outputs.coverage-base && 'decrease' ||
           'not change' }}
-        RATE: "Line Rate"
+        RATE: "Branch Rate"
 
       run: |
         (( CHG=BASE_COVERAGE-COVERAGE ))

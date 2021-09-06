@@ -2,8 +2,10 @@
 [run]
 branch = True
 
+source =
+    .tox/*/lib/python*/site-packages
+
 omit =
-    .tox/*
     setup.py
     test_simple_bus.py
 
@@ -12,7 +14,7 @@ plugins =
 
 [report]
 # must set this to True to see missing
-#show_missing = True
+show_missing = True
 
 # explicitly setting include for source file does NOT fix name="."
 include = redis_ipc.py
@@ -35,5 +37,5 @@ exclude_lines =
 
 ignore_errors = True
 
-#[html]
-#directory = cover
+[html]
+directory = cover
