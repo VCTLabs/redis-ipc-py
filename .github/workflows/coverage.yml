@@ -245,12 +245,12 @@ jobs:
         (( CHG=BASE_COVERAGE-COVERAGE ))
         CHG="${CHG/-/}"
         echo "" > coverage-delta.md
-        echo "Base ${RATE} coverage is ${BASE_COVERAGE}% vs your ${RATE} coverage of ${COVERAGE}%" >> coverage-delta.md
+        echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
-            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would ${DELTA_WORD} coverage" >> coverage-delta.md
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would __${DELTA_WORD}__ coverage" >> coverage-delta.md
         else
-            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would ${DELTA_WORD} coverage by ${CHG}%" >> coverage-delta.md
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
         if [ "${DELTA_WORD}" != "decrease" ]
         then
