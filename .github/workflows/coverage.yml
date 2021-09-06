@@ -119,6 +119,7 @@ jobs:
     outputs:
       coverage: ${{ steps.coverage.outputs.coverage }}
       coverage-rounded-display: ${{ steps.coverage.outputs.coverage-rounded-display }}
+      coverage-report: ${{ steps.report.outputs.coverage-report }}
     env:
       PYTHONIOENCODING: utf-8
       PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
@@ -169,20 +170,24 @@ jobs:
       # use the fixed markdown until new upstream release
       # uses: irongut/CodeCoverageSummary@v1.0.1
       uses: joshjohanning/CodeCoverageSummary@v1.0.2
-      if: ${{ github.event_name == 'pull_request' }}
       with:
         filename: coverage.xml
-        badge: true
         format: 'markdown'
         output: 'both'
 
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2.1.0
-      if: ${{ github.event_name == 'pull_request' }}
-      with:
-        header: coverage
-        recreate: true
-        path: code-coverage-results.md
+    - name: Create report job output
+      id: report
+      run: |
+        REPORT="$( cat code-coverage-results.md )"
+        echo "##[set-output name=coverage-report;]${REPORT}"
+
+    #- name: Add Coverage PR Comment
+      #uses: marocchino/sticky-pull-request-comment@v2.1.0
+      #if: ${{ github.event_name == 'pull_request' }}
+      #with:
+        #header: coverage
+        #recreate: true
+        #path: code-coverage-results.md
 
   test:
     name: Coverage check
@@ -190,6 +195,7 @@ jobs:
     needs: [cov_data, base]
     outputs:
       coverage: ${{ needs.cov_data.outputs.coverage }}
+      coverage-report: ${{ needs.cov_data.outputs.coverage-report }}
       coverage-base: ${{ needs.base.outputs.base_cov }}
       coverage-rounded-display: ${{ needs.cov_data.outputs.coverage-rounded-display }}
 
@@ -197,12 +203,14 @@ jobs:
     - name: Check test coverage
       env:
         COVERAGE: ${{ needs.cov_data.outputs.coverage }}
+        COVERAGE_REPORT: ${{ needs.cov_data.outputs.coverage-report }}
         COVERAGE_ROUNDED: ${{ needs.cov_data.outputs.coverage-rounded-display }}
         BASE_COVERAGE: ${{ needs.base.outputs.base_cov }}
       run: |
         echo "Coverage: ${COVERAGE}"
         echo "Coverage Rounded: ${COVERAGE_ROUNDED}"
         echo "Coverage on Base Branch: ${BASE_COVERAGE}"
+        echo "Coverage Report: ${COVERAGE_REPORT}"
 
   comment_cov_change:
     name: Comment on PR with coverage delta
@@ -234,6 +242,7 @@ jobs:
       env:
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
         COVERAGE: ${{ needs.test.outputs.coverage }}
+        COVERAGE_REPORT: ${{ needs.test.outputs.coverage-report }}
         BASE_COVERAGE: ${{ needs.test.outputs.coverage-base }}
         DELTA_WORD: ${{
           needs.test.outputs.coverage > needs.test.outputs.coverage-base && 'increase' ||
@@ -244,7 +253,8 @@ jobs:
       run: |
         (( CHG=BASE_COVERAGE-COVERAGE ))
         CHG="${CHG/-/}"
-        echo "" > coverage-delta.md
+        echo "${COVERAGE_REPORT}" > coverage-delta.md
+        echo "" >> coverage-delta.md
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
