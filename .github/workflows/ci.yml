@@ -56,11 +56,6 @@ jobs:
       env:
         PLATFORM: ${{ matrix.os }}
 
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        env_vars: OS,PYTHON
-
     - name: Build sdist/wheel
       run: |
         tox -e build
