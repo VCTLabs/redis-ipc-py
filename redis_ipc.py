@@ -20,7 +20,7 @@ from redis import ConnectionPool
 from redis import StrictRedis
 
 
-__version__ = '0.0.0.dev0'
+__version__ = "0.0.0.dev0"
 
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()
@@ -44,8 +44,8 @@ def get_runtimepath():
     Get the runtime socket path
     """
     temp_dir = tempfile.gettempdir()
-    run_dir = os.getenv('RIPC_RUNTIME_DIR', temp_dir)
-    return os.path.join(run_dir, 'redis-ipc', 'socket')
+    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
+    return os.path.join(run_dir, "redis-ipc", "socket")
 
 
 def is_jsonable(obj):
@@ -103,7 +103,7 @@ def redis_connect(socket_path=get_runtimepath()):
         raise_msg = "Socket path {} is not a valid socket".format(socket_path)
         raise RedisIpcExc(raise_msg)
     try:
-        pool = ConnectionPool.from_url('unix://{}'.format(socket_path))
+        pool = ConnectionPool.from_url("unix://{}".format(socket_path))
         client = StrictRedis(connection_pool=pool)
     except (
         redis.exceptions.ConnectionError,
@@ -115,7 +115,7 @@ def redis_connect(socket_path=get_runtimepath()):
 
 
 # the main feature here is a class which will provide the wanted access
-class RedisClient():
+class RedisClient:
     """
     component : friendly name for calling program
                 (e.g. how it is labeled on system architecture diagrams
@@ -140,8 +140,8 @@ class RedisClient():
     def __generate_msg_id(self):
         # unique id for message
         # component name, process number, timestamp
-        timestamp = str(time.time())   # floating timestamp
-        msg_id = self.component + ':' + str(self.process_number) + ':' + timestamp
+        timestamp = str(time.time())  # floating timestamp
+        msg_id = self.component + ":" + str(self.process_number) + ":" + timestamp
         return msg_id, timestamp
 
     def redis_ipc_send_and_receive(self, dest, cmd, tmout):
@@ -216,7 +216,7 @@ class RedisClient():
             return decoded_reply  # good enough
 
 
-class RedisServer():
+class RedisServer:
     """
     component : friendly name for calling program
                 (e.g. how it is labeled on system architecture diagrams
