@@ -247,9 +247,9 @@ jobs:
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
-            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would __${DELTA_WORD}__ coverage" >> coverage-delta.md
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage" >> coverage-delta.md
         else
-            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} would __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
+            echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
         if [ "${DELTA_WORD}" != "decrease" ]
         then

@@ -42,8 +42,8 @@ msgs_dict = [
 
 bad_things = [
     ("bad", "stuff"),
-"{\"msg\": \"This is tricky\", \"severity\": float('nan')}",
-    {'really_bogus': True, 'extra_bogus': [Bogus['FOO'], Bogus['BAZ']]}
+    "{\"msg\": \"This is tricky\", \"severity\": float('nan')}",
+    {'really_bogus': True, 'extra_bogus': [Bogus['FOO'], Bogus['BAZ']]},
 ]
 
 sock_paths = [
