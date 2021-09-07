@@ -58,7 +58,7 @@ def test_redis_connect_no_socket():
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         redis_connection = rconn(sock_paths[1])
-    assert "redis server not available" in str(excinfo.value)
+    assert "socket is not a valid socket" in str(excinfo.value)
 
 
 def test_jdic2pdic_excs():

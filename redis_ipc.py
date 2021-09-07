@@ -100,11 +100,16 @@ def redis_connect(socket_path=get_runtimepath()):
     """
 
     if not Path(socket_path).is_socket():
-        raise NoRedis
+        raise_msg = "Socket path {} is not a valid socket".format(socket_path)
+        raise RedisIpcExc(raise_msg)
     try:
         pool = ConnectionPool.from_url('unix://{}'.format(socket_path))
         client = StrictRedis(connection_pool=pool)
-    except redis.exceptions.ConnectionError as exc:
+    except (
+        redis.exceptions.ConnectionError,
+        redis.ConnectionError,
+        ConnectionError,
+    ) as exc:
         raise NoRedis from exc
     return client
 
