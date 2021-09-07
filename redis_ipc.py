@@ -10,62 +10,20 @@ a light-weight IPC mechanism using JSON formatting and the Redis server as
 import os
 import time
 import json
+import tempfile
+
+from pathlib import Path
+
 import redis
+
+from redis import ConnectionPool
+from redis import StrictRedis
 
 
 __version__ = '0.0.0.dev0'
 
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()
-
-# global data
-"""
-"""
-
-
-# global functions
-def pdic2jdic(pdic):
-    """
-    pdic   -    a Python dictionary
-
-    returns a JSON string
-    """
-    if not isinstance(pdic, dict):
-        raise NotDict
-    try:
-        jd = json.dumps(pdic)
-    except (TypeError, ValueError):
-        raise BadMessage from None
-    return jd
-
-
-def jdic2pdic(jdic):
-    """
-    jdic     -    a JSON string which is a hash
-
-    returns a Python dictionary
-    """
-    try:
-        pd = json.loads(jdic)
-    except (TypeError, ValueError):
-        raise BadMessage from None
-    if not isinstance(pd, dict):
-        raise NotDict
-    return pd
-
-
-# default /tmp path is only used in a trusted/isolated test environment
-def redis_connect(unix_socket_path="/tmp/redis-ipc/socket"):  # nosec
-    """
-    attempt to open a connection to the Redis server
-    raise an exception if this does not work
-    return the connection object if it does work
-    """
-    try:
-        conn = redis.StrictRedis(unix_socket_path=unix_socket_path)
-    except redis.ConnectionError:
-        raise NoRedis from None
-    return conn
 
 
 # exceptions
@@ -79,6 +37,78 @@ BadMessage = RedisIpcExc("redis message not a recognizable message")
 MsgTimeout = RedisIpcExc("redis message request timed out")
 
 
+# global functions
+# default tmp path is only used in a trusted/isolated environment
+def get_runtimepath():
+    """
+    Get the runtime socket path
+    """
+    temp_dir = tempfile.gettempdir()
+    run_dir = os.getenv('RIPC_RUNTIME_DIR', temp_dir)
+    return os.path.join(run_dir, 'redis-ipc', 'socket')
+
+
+def is_jsonable(obj):
+    """
+    Test if obj can be dumped as JSON
+    """
+    try:
+        json.dumps(obj)
+        return True
+    except (TypeError, OverflowError):
+        return False
+
+
+def is_unjsonable(obj):
+    """
+    Test if obj can be loaded as JSON
+    """
+    try:
+        json.loads(obj)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def pdic2jdic(pdic):
+    """
+    pdic    -    a Python dictionary
+
+    returns a JSON string
+    """
+    if not is_jsonable(pdic):
+        raise BadMessage
+    return json.dumps(pdic)
+
+
+def jdic2pdic(jstr):
+    """
+    jstr    -    a JSON string which is a hash
+
+    returns a Python dictionary
+    """
+    if not is_unjsonable(jstr):
+        raise NotDict
+    return json.loads(jstr)
+
+
+def redis_connect(socket_path=get_runtimepath()):
+    """
+    attempt to open a connection to the Redis server
+    raise an exception if this does not work
+    return the connection object if it does work
+    """
+
+    if not Path(socket_path).is_socket():
+        raise NoRedis
+    try:
+        pool = ConnectionPool.from_url('unix://{}'.format(socket_path))
+        client = StrictRedis(connection_pool=pool)
+    except redis.exceptions.ConnectionError as exc:
+        raise NoRedis from exc
+    return client
+
+
 # the main feature here is a class which will provide the wanted access
 class RedisClient():
     """
@@ -90,7 +120,6 @@ class RedisClient():
     """
 
     def __init__(self, component, thread="main"):
-        # global redis_connect
         self.component = component
         self.thread = thread
 
@@ -106,14 +135,14 @@ class RedisClient():
     def __generate_msg_id(self):
         # unique id for message
         # component name, process number, timestamp
-        ts = str(time.time())   # floating timestamp
-        the_id = self.component + ':' + str(self.process_number) + ':' + ts
-        return the_id, ts
+        timestamp = str(time.time())   # floating timestamp
+        msg_id = self.component + ':' + str(self.process_number) + ':' + timestamp
+        return msg_id, timestamp
 
     def redis_ipc_send_and_receive(self, dest, cmd, tmout):
         """
         dest     -   name of the component to handle this command (string)
-        cmd      -   the command to send (a Python dictionary)
+        cmd      -   the command to send (must be a Python dictionary)
         tmout    -   timeout for receiving a response, floating seconds
         """
         # add standard fields to the command dictionary
@@ -157,13 +186,12 @@ class RedisClient():
         cmd           - command for which we await a reply
         tmout         - timeout for receiving a response, floating seconds
 
-        a proper response is a JSON dictionary
+        a proper response is a JSON string (dictionary)
         turn it into a Python dictionary
 
         if the request timed out, the response is empty,
-        and an exception will be raised
-        if a non-empty value was received, if it is not the response
-        to the specified command
+        and an exception will be raised if a non-empty value was received,
+        if it is not the response to the specified command
            try again
         else
            return this result
@@ -187,7 +215,7 @@ class RedisServer():
     """
     component : friendly name for calling program
                 (e.g. how it is labeled on system architecture diagrams
-                 as opposed to exact executable name)
+                as opposed to exact executable name)
     """
 
     def __init__(self, component):
