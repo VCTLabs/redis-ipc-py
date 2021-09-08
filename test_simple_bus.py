@@ -154,7 +154,5 @@ def test_ipc_send_receive():
     for component in components[1], components[0]:
         cmd_queue = "queues.commands.{}".format(component)
         rconn(sock_paths[0]).blpop(cmd_queue, 1)
-    #cmd_queue = "queues.commands.{}".format(components[0])
-    #rconn(sock_paths[0]).blpop(cmd_queue, 1)
 
     proc.join()
