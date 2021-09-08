@@ -14,8 +14,6 @@ import tempfile
 
 from pathlib import Path
 
-import redis
-
 from redis import ConnectionPool
 from redis import StrictRedis
 
@@ -105,11 +103,8 @@ def redis_connect(socket_path=get_runtimepath()):
     try:
         pool = ConnectionPool.from_url("unix://{}".format(socket_path))
         client = StrictRedis(connection_pool=pool)
-    except (
-        redis.exceptions.ConnectionError,
-        redis.ConnectionError,
-        ConnectionError,
-    ) as exc:
+
+    except (redis.exceptions.ConnectionError) as exc:
         raise NoRedis from exc
     return client
 

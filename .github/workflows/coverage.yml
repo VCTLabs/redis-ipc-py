@@ -130,7 +130,7 @@ jobs:
 
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.9'
 
     - name: Install redis (ubuntu)
       run: |
@@ -145,7 +145,7 @@ jobs:
     - name: Generate coverage and fix pkg name
       # another workaround for coverage.py missing package name
       run: |
-        tox -e py38-cov-linux
+        tox -e py39-cov-linux
         ./scripts/fix_pkg_name.sh
 
     - name: Code Coverage Summary Report (Text & Value)
