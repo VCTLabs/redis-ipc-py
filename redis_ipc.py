@@ -14,6 +14,8 @@ import tempfile
 
 from pathlib import Path
 
+import redis
+
 from redis import ConnectionPool
 from redis import StrictRedis
 
