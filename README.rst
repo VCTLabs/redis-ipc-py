@@ -213,7 +213,7 @@ remember to specify the socket path when running redis-cli ::
     :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml
     :alt: GitHub CI Pylint Status
 
-.. |cov| image:: https://raw.githubusercontent.com/VCTLabs/redis-ipc-py/badges/exc-tests/test-coverage.svg
+.. |cov| image:: https://raw.githubusercontent.com/VCTLabs/redis-ipc-py/badges/develop/test-coverage.svg
     :target: https://github.com/VCTLabs/redis-ipc-py/
     :alt: Test coverage
 
