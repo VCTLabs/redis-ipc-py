@@ -35,11 +35,14 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt-get install -yqq redis-server
+        sudo systemctl stop redis
 
     - name: Install redis (macos)
       if: runner.os == 'macOS'
       run: |
+        brew tap homebrew/services
         brew install redis
+        brew services stop redis
 
     - uses: actions/setup-python@v2
       with:
