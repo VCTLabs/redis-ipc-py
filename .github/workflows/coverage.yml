@@ -234,14 +234,18 @@ jobs:
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
         COVERAGE: ${{ needs.test.outputs.coverage }}
         BASE_COVERAGE: ${{ needs.test.outputs.coverage-base }}
-        DELTA_WORD: ${{
-          needs.test.outputs.coverage > needs.test.outputs.coverage-base && 'increase' ||
-          needs.test.outputs.coverage < needs.test.outputs.coverage-base && 'decrease' ||
-          'not change' }}
+        DELTA_WORD: "not change"
         RATE: "Branch Rate"
 
       run: |
-        (( CHG=BASE_COVERAGE-COVERAGE ))
+        if [ "${COVERAGE}" > "${BASE_COVERAGE}" ]
+        then
+            DELTA_WORD="increase"
+        elif [ "${COVERAGE}" < "${BASE_COVERAGE}" ]
+        then
+            DELTA_WORD="decrease"
+        fi
+        (( CHG=COVERAGE-BASE_COVERAGE ))
         CHG="${CHG/-/}"
         echo "" > coverage-delta.md
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
