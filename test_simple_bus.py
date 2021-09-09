@@ -107,10 +107,9 @@ def test_redis_connect_with_addr():
         redis_connection = rconn(sock_paths[0], server_addr=get_serveraddr())
         assert "localhost" in get_serveraddr()
 
-        # this will generate Connection refused error
         with pytest.raises(redis.exceptions.ConnectionError) as excinfo:
             redis_connection.info()
-        assert "Error 111 connecting to localhost" in str(excinfo.value)
+        assert "Connection refused" in str(excinfo.value)
 
 
 def test_jdic2pdic_excs():
