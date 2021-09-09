@@ -248,6 +248,8 @@ jobs:
         (( CHG=COVERAGE-BASE_COVERAGE ))
         CHG="${CHG/-/}"
         echo "" > coverage-delta.md
+        echo "Hello @${{ github.actor }}! Thanks for opening this PR. We found the following information based on analysis of the coverage report:" >> coverage-delta.md
+        echo "" >> coverage-delta.md
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
@@ -258,7 +260,7 @@ jobs:
         if [ "${DELTA_WORD}" == "increase" ]
         then
             echo "" >> coverage-delta.md
-            echo "Nice work, @${{ github.actor }} :rocket:" >> coverage-delta.md
+            echo "Nice work, @${{ github.actor }}. Cheers! :rocket:" >> coverage-delta.md
         fi
 
     - name: Comment PR with test coverage delta
