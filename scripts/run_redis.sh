@@ -11,6 +11,7 @@ failures=0
 trap 'failures=$((failures+1))' ERR
 
 CMD_ARG=${1:-status}
+PORT=${PORT:-0}
 VERBOSE="false"  # set to "true" for extra output
 export RIPC_RUNTIME_DIR=${RIPC_RUNTIME_DIR:-/tmp}
 
@@ -24,7 +25,7 @@ fi
 if [[ "${CMD_ARG}" = "start" ]]; then
     [[ "${VERBOSE}" = "true" ]]  && echo "starting redis-server on local socket..."
     mkdir -p ${RIPC_RUNTIME_DIR}/redis-ipc/
-    redis-server --port 0 --pidfile ${RIPC_RUNTIME_DIR}/redis.pid --unixsocket ${RIPC_RUNTIME_DIR}/redis-ipc/socket --unixsocketperm 600 &
+    redis-server --port ${PORT} --pidfile ${RIPC_RUNTIME_DIR}/redis.pid --unixsocket ${RIPC_RUNTIME_DIR}/redis-ipc/socket --unixsocketperm 600 &
     sleep 1
     redis-cli -s ${RIPC_RUNTIME_DIR}/redis-ipc/socket config set save ""
 fi
