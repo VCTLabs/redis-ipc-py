@@ -3,10 +3,14 @@ import time
 
 from enum import Enum
 from multiprocessing import Process
+from unittest import mock
 
 import pytest
 
+import redis
 import redis_ipc
+
+from redis_ipc import get_serveraddr
 
 from redis_ipc import jdic2pdic as fromJson
 from redis_ipc import pdic2jdic as toJson
@@ -68,6 +72,26 @@ sock_paths = [
     "/run/sudo",
 ]
 
+net_env_vars = {
+    'RIPC_TEST_ENV': 'true',
+    'RIPC_SERVER_ADDR': 'localhost'
+}
+
+test_only = {'RIPC_TEST_ENV': 'true'}
+
+addr_only = {'RIPC_SERVER_ADDR': 'localhost'}
+
+def test_get_serveraddr():
+    """ monkeypatch env test """
+    with mock.patch.dict(os.environ, test_only):
+        assert get_serveraddr() is None
+
+    with mock.patch.dict(os.environ, addr_only):
+        assert get_serveraddr() is None
+
+    with mock.patch.dict(os.environ, net_env_vars):
+        assert get_serveraddr() == "localhost"
+
 
 def test_redis_connect_no_socket():
     """ exception tests for bad socket path """
@@ -75,6 +99,18 @@ def test_redis_connect_no_socket():
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         redis_connection = rconn(sock_paths[1])
     assert "socket is not a valid socket" in str(excinfo.value)
+
+
+def test_redis_connect_with_addr():
+    """ monkeypatch env vars and test with localhost """
+    with mock.patch.dict(os.environ, net_env_vars):
+        redis_connection = rconn(sock_paths[0], server_addr=get_serveraddr())
+        assert "localhost" in get_serveraddr()
+
+        # this will generate Connection refused error
+        with pytest.raises(redis.exceptions.ConnectionError) as excinfo:
+            redis_connection.info()
+        assert "Error 111 connecting to localhost" in str(excinfo.value)
 
 
 def test_jdic2pdic_excs():
