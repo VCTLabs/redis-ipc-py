@@ -255,10 +255,10 @@ jobs:
         else
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
-        if [ "${DELTA_WORD}" != "decrease" ]
+        if [ "${DELTA_WORD}" == "increase" ]
         then
             echo "" >> coverage-delta.md
-            echo "Nice work, @${{ github.actor }} :)" >> coverage-delta.md
+            echo "Nice work, @${{ github.actor }} :rocket:" >> coverage-delta.md
         fi
 
     - name: Comment PR with test coverage delta

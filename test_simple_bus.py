@@ -81,6 +81,7 @@ test_only = {'RIPC_TEST_ENV': 'true'}
 
 addr_only = {'RIPC_SERVER_ADDR': 'localhost'}
 
+
 def test_get_serveraddr():
     """ monkeypatch env test """
     with mock.patch.dict(os.environ, test_only):
