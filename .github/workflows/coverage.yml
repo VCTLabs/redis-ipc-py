@@ -136,6 +136,7 @@ jobs:
       run: |
         sudo apt-get -qq update
         sudo apt-get install -yqq redis-server
+        sudo systemctl stop redis
 
     - name: Add python requirements
       run: |
@@ -146,7 +147,6 @@ jobs:
       # another workaround for coverage.py missing package name
       run: |
         tox -e py39-cov-linux
-        ./scripts/fix_pkg_name.sh
 
     - name: Code Coverage Summary Report (Text & Value)
       # use the fixed markdown until new upstream release
