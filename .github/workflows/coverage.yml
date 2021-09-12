@@ -326,7 +326,7 @@ jobs:
         git config --local user.name "GitHub Action"
         mkdir -p "${BRANCH}"
         mv "${FILE}" "${BRANCH}"
-        echo "${COVERAGE}" > "${DATA}"
+        echo "${COVERAGE}" > "${BRANCH}/${DATA}"
         git add "${BRANCH}/${FILE}" "${BRANCH}/${DATA}"
         # Will give error if badge has not changed
         git commit -m "Add/Update badge" || true
