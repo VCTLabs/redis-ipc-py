@@ -37,28 +37,7 @@ BadMessage = RedisIpcExc("redis message not a recognizable message")
 MsgTimeout = RedisIpcExc("redis message request timed out")
 
 
-# global functions
-# default socket path or address should only be used in a trusted/isolated
-# environment
-def get_runtimepath():
-    """
-    Get the runtime socket path
-    """
-    temp_dir = tempfile.gettempdir()
-    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
-    return os.path.join(run_dir, "redis-ipc", "socket")
-
-
-def get_serveraddr():
-    """
-    Get the redis server address if defined in ENV (should be either
-    a resolvable hostname or ``localhost``)
-    """
-    if os.getenv("RIPC_TEST_ENV"):
-        return os.getenv("RIPC_SERVER_ADDR")
-    return None
-
-
+# module-level functions and variables
 def is_jsonable(obj):
     """
     Test if obj can be dumped as JSON
@@ -103,7 +82,32 @@ def jdic2pdic(jstr):
     return json.loads(jstr)
 
 
-def redis_connect(socket_path=get_runtimepath(), server_addr=get_serveraddr()):
+# default socket path or address should only be used in a trusted/isolated
+# environment
+def get_runtimepath():
+    """
+    Get the runtime socket path
+    """
+    temp_dir = tempfile.gettempdir()
+    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
+    return os.path.join(run_dir, "redis-ipc", "socket")
+
+
+def get_serveraddr():
+    """
+    Get the redis server address if defined in ENV (should be either
+    a resolvable hostname or ``localhost``)
+    """
+    if os.getenv("RIPC_TEST_ENV"):
+        return os.getenv("RIPC_SERVER_ADDR")
+    return None
+
+
+ripc_socket_path = get_runtimepath()
+ripc_server_address = get_serveraddr()
+
+
+def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address):
     """
     attempt to open a connection to the Redis server
     raise an exception if this does not work
