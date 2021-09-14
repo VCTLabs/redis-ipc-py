@@ -1,4 +1,5 @@
 # python development/tools requirements file
+pre-commit
 pylint
 bandit
 flake8

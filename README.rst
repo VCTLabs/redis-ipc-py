@@ -8,19 +8,19 @@ A small python module implementing redis-ipc concepts.
 
 |python| |tag| |license| |style|
 
-redis-ipc is an example of how redis_ can be used as an advanced IPC 
+redis-ipc is an example of how redis_ can be used as an advanced IPC
 mechanism on an embedded Linux system, for instance as a substitute for the
-more common choice of dbus. 
+more common choice of dbus.
 
 redis-ipc is intended to make communication among different logical components
-of a system convenient. It is not intended to replace shared memory for high 
+of a system convenient. It is not intended to replace shared memory for high
 data-rate transfers between processes, where lowest possible overhead is key,
 but to provide a convenient and reliable way to implement the following
 IPC mechanisms:
 
-* command queues 
-* settings 
-* status 
+* command queues
+* settings
+* status
 * event channels
 
 redis-ipc comes in 2 flavors, a python module (this repo) and a lightweight
@@ -34,11 +34,9 @@ Quick Start Dev Environment
 ===========================
 
 As there are not any Pypi packages available yet, you'll need to first
-clone this reposiory and then install locally (see below).
+clone this repository and then install locally (see below).
 
 .. note:: All dependencies are optional except `redis-py`.
-
-.. _tox: https://github.com/tox-dev/tox
 
 
 Dev Install
@@ -56,11 +54,16 @@ the tests (including style checkers and test coverage).
 
   $ git clone https://github.com/VCTLabs/redis-ipc-py
   $ cd redis-ipc-py
-  $ tox -e tests
+  $ tox -e py<NN>-cov-<platform>
+
+where <NN> is your local version of python, and <platform> is one of either
+``linux`` or ``macos``, eg::
+
+  $ tox -e py38-cov-linux
 
 The above will run the default tox testenv, which includes the following:
 
-* pre_test - install in tox env via ``pip`` and start the redis server
+* pre_test - install redis_ipc in tox env via ``pip`` and start the redis server
 * test - run the simple msg bus send/receive tests with coverage
 * post_test - stop the redis server
 
@@ -73,16 +76,20 @@ Other tox environment arguments you can pass include:
 
 * ``tox -e build`` will build the python packages and run package checks
 * ``tox -e style`` will run the ``flake8`` and ``pycodestyle`` (PEP8) style checks
-* ``tox -e lint`` will run pylint (somewhat less permissive than PEP8/flake8 checks)
-* ``tox -e noredis`` will run the legacy doctests
+* ``tox -e lint`` will run ``pylint`` (somewhat less permissive than PEP8/flake8 checks)
+* ``tox -e black`` will run the ``black`` style checker
+* ``tox -e diff`` will run ``black --diff`` if the above has any issues
+
+
+.. _tox: https://github.com/tox-dev/tox
 
 
 Standards and Coding Style
 --------------------------
 
-Both pep8 and flake8 are part of the above test suite.  There are also
-some CI pylint and bandit code analysis checks for complexity and security
-issues (we try to keep the "cognitive complexity" low when possible).
+Black style and both pep8 and flake8 are part of the above test suite.  There are also
+some CI pylint and bandit code analysis checks for complexity and security issues
+(we try to keep the "cognitive complexity" low when possible).
 
 
 Usage Example
@@ -96,7 +103,7 @@ so you'll need to install and start a redis server first.
 Using your system package manager, install the redis server package for your
 platform:
 
-* on Gentoo: ``sudo emerge redis``
+* on Gentoo: ``sudo emerge dev-db/redis dev-python/tox``
 * on Ubuntu: ``sudo apt-get install redis-server``
 * on CentOS::
 
@@ -109,25 +116,54 @@ before proceeding::
 
   sudo systemctl stop redis
 
+If your distro doesn't currently package ``tox``, first complain (consider filing
+a "missing package" bug) and then use ``pip`` to install it into your usual python
+environment.
 
-From the repository directory, you should either add "." to your PYTHON_PATH
-or copy the python module to ``site-packages``; for this example you can use
-the command shown below.
 
 Testing With Tox
 ----------------
 
 Once you have a ``redis-server`` installed, you can simply run the above
-``tox`` command to manage the redis server component and run the tests, eg::
+``tox`` command to manage the redis server component and run the tests
+for your local python version and OS platform, ie::
 
-  $ tox -e tests
+  $ tox -e py38-cov-macos
 
 The following section illustrates the (approximate) manual test steps run
 by the above command.
 
+Developer Mode
+--------------
 
-Manual Testing Steps
+To manually control ``redis-server`` and monitor the traffic on redis, use
+a workflow something like this. starting from the project source directory::
+
+  $ ./scripts/run_redis.sh start
+
+Open another terminal window and start the monitor::
+
+  $ redis-cli -s /tmp/redis-ipc/socket monitor
+
+From the first terminal window, run the (alternate) tests target::
+
+  $  tox -e tests
+
+Observe both terminals; the tests should complete successfully with the
+test data cleared from redis, so executing the tests several times should
+all succeed.  To manually clear all data from redis, simply stop and
+start the server::
+
+  $ ./scripts/run_redis.sh stop
+  $ ./scripts/run_redis.sh start
+
+
+Manual Example Steps
 --------------------
+
+From the repository directory, you should either add "." to your PYTHON_PATH
+or copy the python module to ``site-packages``; for this example you can use
+the command shown below.
 
 To start a local redis server first, run the following *before* you start
 the python interpreter::
@@ -151,7 +187,7 @@ the first terminal::
     >>> sys.path.append('.')
     >>> from redis_ipc import RedisClient as rc
     >>> myClient = rc("my_component")
-    >>> myClient.redis_ipc_send_and_receive("my_component", {}, 30)  # doctest: +SKIP
+    >>> myClient.redis_ipc_send_and_receive("my_component", {}, 30)
     {'timestamp': '1627166512.0108066', 'component': 'my_component', 'thread': 'main', 'tid': 24544, 'results_queue': 'queues.results.my_component.main', 'command_id': 'my_component:24544:1627166512.0108066'}
 
 Then from a second terminal, start a server process::
@@ -160,8 +196,8 @@ Then from a second terminal, start a server process::
     >>> sys.path.append('.')
     >>> from redis_ipc import RedisServer as rs
     >>> myServer = rs("my_component")
-    >>> result = myServer.redis_ipc_receive_command()  # doctest: +SKIP
-    >>> myServer.redis_ipc_send_reply(result, result)  # doctest: +SKIP
+    >>> result = myServer.redis_ipc_receive_command()
+    >>> myServer.redis_ipc_send_reply(result, result)
 
 
 Note that client side of the above will block for the timeout period (30 sec in
@@ -174,7 +210,7 @@ If there is no running redis server, then you will get the following::
     >>> sys.path.append('.')
     >>> from redis_ipc import RedisServer as rs
     >>> myServer = rs("my_component")
-    >>> result = myServer.redis_ipc_receive_command()  # doctest: +ELLIPSIS
+    >>> result = myServer.redis_ipc_receive_command()
     Traceback (most recent call last):
     ...
     redis.exceptions.ConnectionError: Error 2 connecting to unix socket: /tmp/redis-ipc/socket. No such file or directory.

@@ -37,17 +37,7 @@ BadMessage = RedisIpcExc("redis message not a recognizable message")
 MsgTimeout = RedisIpcExc("redis message request timed out")
 
 
-# global functions
-# default tmp path is only used in a trusted/isolated environment
-def get_runtimepath():
-    """
-    Get the runtime socket path
-    """
-    temp_dir = tempfile.gettempdir()
-    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
-    return os.path.join(run_dir, "redis-ipc", "socket")
-
-
+# module-level functions and variables
 def is_jsonable(obj):
     """
     Test if obj can be dumped as JSON
@@ -76,7 +66,7 @@ def pdic2jdic(pdic):
 
     returns a JSON string
     """
-    if not is_jsonable(pdic):
+    if not (is_jsonable(pdic) and isinstance(pdic, dict)):
         raise BadMessage
     return json.dumps(pdic)
 
@@ -92,7 +82,32 @@ def jdic2pdic(jstr):
     return json.loads(jstr)
 
 
-def redis_connect(socket_path=get_runtimepath()):
+# default socket path or address should only be used in a trusted/isolated
+# environment
+def get_runtimepath():
+    """
+    Get the runtime socket path
+    """
+    temp_dir = tempfile.gettempdir()
+    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
+    return os.path.join(run_dir, "redis-ipc", "socket")
+
+
+def get_serveraddr():
+    """
+    Get the redis server address if defined in ENV (should be either
+    a resolvable hostname or ``localhost``)
+    """
+    if os.getenv("RIPC_TEST_ENV"):
+        return os.getenv("RIPC_SERVER_ADDR")
+    return None
+
+
+ripc_socket_path = get_runtimepath()
+ripc_server_address = get_serveraddr()
+
+
+def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address):
     """
     attempt to open a connection to the Redis server
     raise an exception if this does not work
@@ -102,14 +117,15 @@ def redis_connect(socket_path=get_runtimepath()):
     if not Path(socket_path).is_socket():
         raise_msg = "Socket path {} is not a valid socket".format(socket_path)
         raise RedisIpcExc(raise_msg)
+
     try:
-        pool = ConnectionPool.from_url("unix://{}".format(socket_path))
+        if not server_addr:
+            pool = ConnectionPool.from_url("unix://{}".format(socket_path))
+        else:
+            pool = ConnectionPool.from_url("redis://{}".format(server_addr))
         client = StrictRedis(connection_pool=pool)
-    except (
-        redis.exceptions.ConnectionError,
-        redis.ConnectionError,
-        ConnectionError,
-    ) as exc:
+
+    except (redis.exceptions.ConnectionError) as exc:
         raise NoRedis from exc
     return client
 

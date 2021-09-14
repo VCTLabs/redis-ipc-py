@@ -130,12 +130,13 @@ jobs:
 
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.9'
 
     - name: Install redis (ubuntu)
       run: |
         sudo apt-get -qq update
         sudo apt-get install -yqq redis-server
+        sudo systemctl stop redis
 
     - name: Add python requirements
       run: |
@@ -145,8 +146,7 @@ jobs:
     - name: Generate coverage and fix pkg name
       # another workaround for coverage.py missing package name
       run: |
-        tox -e py38-cov-linux
-        ./scripts/fix_pkg_name.sh
+        tox -e py39-cov-linux
 
     - name: Code Coverage Summary Report (Text & Value)
       # use the fixed markdown until new upstream release
@@ -234,16 +234,22 @@ jobs:
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
         COVERAGE: ${{ needs.test.outputs.coverage }}
         BASE_COVERAGE: ${{ needs.test.outputs.coverage-base }}
-        DELTA_WORD: ${{
-          needs.test.outputs.coverage > needs.test.outputs.coverage-base && 'increase' ||
-          needs.test.outputs.coverage < needs.test.outputs.coverage-base && 'decrease' ||
-          'not change' }}
+        DELTA_WORD: "not change"
         RATE: "Branch Rate"
 
       run: |
-        (( CHG=BASE_COVERAGE-COVERAGE ))
+        if [ "${COVERAGE}" > "${BASE_COVERAGE}" ]
+        then
+            DELTA_WORD="increase"
+        elif [ "${COVERAGE}" < "${BASE_COVERAGE}" ]
+        then
+            DELTA_WORD="decrease"
+        fi
+        (( CHG=COVERAGE-BASE_COVERAGE ))
         CHG="${CHG/-/}"
         echo "" > coverage-delta.md
+        echo "Hello @${{ github.actor }}! Thanks for opening this PR. We found the following information based on analysis of the coverage report:" >> coverage-delta.md
+        echo "" >> coverage-delta.md
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
         if [ "${CHG}" == "0" ]
         then
@@ -251,10 +257,10 @@ jobs:
         else
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
-        if [ "${DELTA_WORD}" != "decrease" ]
+        if [ "${DELTA_WORD}" == "increase" ]
         then
             echo "" >> coverage-delta.md
-            echo "Nice work, @${{ github.actor }} :)" >> coverage-delta.md
+            echo "Nice work, @${{ github.actor }}. Cheers! :rocket:" >> coverage-delta.md
         fi
 
     - name: Comment PR with test coverage delta
@@ -320,7 +326,7 @@ jobs:
         git config --local user.name "GitHub Action"
         mkdir -p "${BRANCH}"
         mv "${FILE}" "${BRANCH}"
-        echo "${COVERAGE}" > "${DATA}"
+        echo "${COVERAGE}" > "${BRANCH}/${DATA}"
         git add "${BRANCH}/${FILE}" "${BRANCH}/${DATA}"
         # Will give error if badge has not changed
         git commit -m "Add/Update badge" || true
@@ -331,39 +337,3 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: badges
         directory: badges
-
-    - name: Badge image URL
-      id: url
-      env:
-        BRANCH: ${{ needs.pre_ci.outputs.branch }}
-        FILE: 'test-coverage.svg'
-        COVERAGE: ${{ needs.test.outputs.coverage-rounded-display }}
-      run: |
-        URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/badges/${BRANCH}/${FILE}"
-        MARKDOWN="![Coverage ${COVERAGE}](${URL})"
-        echo "Badge URL: ${URL}"
-        echo "Badge image for Markdown: ${MARKDOWN}"
-        echo "##[set-output name=url;]${URL}"
-        echo "##[set-output name=markdown;]${MARKDOWN}"
-
-  comment_pr_badge:
-    name: Comment on PR with generated badge
-    runs-on: ubuntu-20.04
-    needs: [pre_ci, badge]
-    if: ${{ github.event_name == 'push' }}
-
-    steps:
-    - name: Generate comment file with test coverage badge
-      shell: bash
-      env:
-        BADGE: ${{ needs.badge.outputs.markdown }}
-      run: |
-        echo "Badge: ${BADGE}"
-        echo "${BADGE}" > output.md
-
-    - name: Comment PR with test coverage badge
-      uses: marocchino/sticky-pull-request-comment@v2.1.0
-      with:
-        header: badge
-        recreate: true
-        path: output.md
