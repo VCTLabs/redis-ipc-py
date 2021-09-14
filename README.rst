@@ -8,19 +8,19 @@ A small python module implementing redis-ipc concepts.
 
 |python| |tag| |license| |style|
 
-redis-ipc is an example of how redis_ can be used as an advanced IPC 
+redis-ipc is an example of how redis_ can be used as an advanced IPC
 mechanism on an embedded Linux system, for instance as a substitute for the
-more common choice of dbus. 
+more common choice of dbus.
 
 redis-ipc is intended to make communication among different logical components
-of a system convenient. It is not intended to replace shared memory for high 
+of a system convenient. It is not intended to replace shared memory for high
 data-rate transfers between processes, where lowest possible overhead is key,
 but to provide a convenient and reliable way to implement the following
 IPC mechanisms:
 
-* command queues 
-* settings 
-* status 
+* command queues
+* settings
+* status
 * event channels
 
 redis-ipc comes in 2 flavors, a python module (this repo) and a lightweight
