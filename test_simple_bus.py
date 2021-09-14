@@ -98,7 +98,7 @@ def test_redis_connect_no_socket():
     """ exception tests for bad socket path """
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
-        redis_connection = rconn(sock_paths[1])
+        redis_connection = rconn(sock_paths[1])  # noqa
     assert "socket is not a valid socket" in str(excinfo.value)
 
 
@@ -183,7 +183,7 @@ def test_ipc_send_receive():
     assert res["thread"] == channels[0]
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
-        res_dbg = other.redis_ipc_send_and_receive(components[1], {}, 1)
+        res_dbg = other.redis_ipc_send_and_receive(components[1], {}, 1)  # noqa
     assert "redis message request timed out" in str(excinfo.value)
 
     # cleanup stale msgs
