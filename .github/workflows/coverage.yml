@@ -1,3 +1,6 @@
+# internal coverage PR comment and badge v0.0.2
+# badge and comment job logic should be tuned for personal vs org use
+# (see badge job comments below)
 name: Coverage
 
 on:
@@ -226,6 +229,7 @@ jobs:
         fi
         echo "HAVE_BASE_COVERAGE is ${BASE_RESULT}"
         echo "HAVE_BASE_COVERAGE=${BASE_RESULT}" >> $GITHUB_ENV
+        echo "BASE_COVERAGE=${BASE}" >> $GITHUB_ENV
 
     - name: Collect variables and construct comment for delta message
       if: env.HAVE_BASE_COVERAGE == 'true'
@@ -238,26 +242,26 @@ jobs:
         RATE: "Branch Rate"
 
       run: |
-        if [ "${COVERAGE}" > "${BASE_COVERAGE}" ]
+        if [ "${COVERAGE}" -gt "${BASE_COVERAGE}" ]
         then
             DELTA_WORD="increase"
-        elif [ "${COVERAGE}" < "${BASE_COVERAGE}" ]
+        elif [ "${COVERAGE}" -lt "${BASE_COVERAGE}" ]
         then
             DELTA_WORD="decrease"
         fi
-        (( CHG=COVERAGE-BASE_COVERAGE ))
+        CHG=$(( COVERAGE - BASE_COVERAGE ))
         CHG="${CHG/-/}"
         echo "" > coverage-delta.md
         echo "Hello @${{ github.actor }}! Thanks for opening this PR. We found the following information based on analysis of the coverage report:" >> coverage-delta.md
         echo "" >> coverage-delta.md
         echo "__Base__ ${RATE} coverage is __${BASE_COVERAGE}%__" >> coverage-delta.md
-        if [ "${CHG}" == "0" ]
+        if [ "${CHG}" = "0" ]
         then
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage" >> coverage-delta.md
         else
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
-        if [ "${DELTA_WORD}" == "increase" ]
+        if ! [ "${DELTA_WORD}" = "decrease" ]
         then
             echo "" >> coverage-delta.md
             echo "Nice work, @${{ github.actor }}. Cheers! :rocket:" >> coverage-delta.md
