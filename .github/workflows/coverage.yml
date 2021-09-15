@@ -226,9 +226,10 @@ jobs:
         fi
         echo "HAVE_BASE_COVERAGE is ${BASE_RESULT}"
         echo "HAVE_BASE_COVERAGE=${BASE_RESULT}" >> $GITHUB_ENV
+        echo "BASE_COVERAGE=${BASE}" >> $GITHUB_ENV
 
     - name: Collect variables and construct comment for delta message
-      if: env.HAVE_BASE_COVERAGE == 'true'
+      if: env.HAVE_BASE_COVERAGE == 'true' && env.BASE_COVERAGE < '100'
       shell: bash
       env:
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
@@ -265,7 +266,7 @@ jobs:
 
     - name: Comment PR with test coverage delta
       uses: marocchino/sticky-pull-request-comment@v2.1.1
-      if: env.HAVE_BASE_COVERAGE == 'true'
+      if: env.HAVE_BASE_COVERAGE == 'true' && env.BASE_COVERAGE < '100'
       with:
         header: delta
         recreate: true
