@@ -1,3 +1,6 @@
+# internal coverage PR comment and badge v0.0.2
+# badge and comment job logic should be tuned for personal vs org use
+# (see badge job comments below)
 name: Coverage
 
 on:
@@ -230,7 +233,7 @@ jobs:
 
     - name: Collect variables and construct comment for delta message
       if: env.HAVE_BASE_COVERAGE == 'true'
-      shell: bash --noprofile --norc -e -x {0}
+      shell: bash
       env:
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
         COVERAGE: ${{ needs.test.outputs.coverage }}
@@ -258,7 +261,7 @@ jobs:
         else
             echo "Merging ${{ github.sha }} into ${BASE_BRANCH} will __${DELTA_WORD}__ coverage by __${CHG}%__" >> coverage-delta.md
         fi
-        if [ "${DELTA_WORD}" = "increase" ]
+        if ! [ "${DELTA_WORD}" = "decrease" ]
         then
             echo "" >> coverage-delta.md
             echo "Nice work, @${{ github.actor }}. Cheers! :rocket:" >> coverage-delta.md
