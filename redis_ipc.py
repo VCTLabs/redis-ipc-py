@@ -20,7 +20,7 @@ from redis import ConnectionPool
 from redis import StrictRedis
 
 
-__version__ = "0.0.0.dev0"
+__version__ = "0.0.1"
 
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()
