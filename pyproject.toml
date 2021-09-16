@@ -15,7 +15,8 @@ show_missing = true
 
 [tool.black]
 line-length = 84
-include = 'redis_ipc.py'
+skip-string-normalization = true
+include = '\.py$'
 exclude = '''
 /(
     \.git
