@@ -20,7 +20,7 @@ from redis import ConnectionPool
 from redis import StrictRedis
 
 
-__version__ = "0.0.0.dev0"
+__version__ = '0.0.1'
 
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()
@@ -31,10 +31,10 @@ class RedisIpcExc(Exception):
     pass
 
 
-NoRedis = RedisIpcExc("redis server not available")
-NotDict = RedisIpcExc("redis message was not a Python dictionary")
-BadMessage = RedisIpcExc("redis message not a recognizable message")
-MsgTimeout = RedisIpcExc("redis message request timed out")
+NoRedis = RedisIpcExc('redis server not available')
+NotDict = RedisIpcExc('redis message was not a Python dictionary')
+BadMessage = RedisIpcExc('redis message not a recognizable message')
+MsgTimeout = RedisIpcExc('redis message request timed out')
 
 
 # module-level functions and variables
@@ -89,8 +89,8 @@ def get_runtimepath():
     Get the runtime socket path
     """
     temp_dir = tempfile.gettempdir()
-    run_dir = os.getenv("RIPC_RUNTIME_DIR", temp_dir)
-    return os.path.join(run_dir, "redis-ipc", "socket")
+    run_dir = os.getenv('RIPC_RUNTIME_DIR', temp_dir)
+    return os.path.join(run_dir, 'redis-ipc', 'socket')
 
 
 def get_serveraddr():
@@ -98,8 +98,8 @@ def get_serveraddr():
     Get the redis server address if defined in ENV (should be either
     a resolvable hostname or ``localhost``)
     """
-    if os.getenv("RIPC_TEST_ENV"):
-        return os.getenv("RIPC_SERVER_ADDR")
+    if os.getenv('RIPC_TEST_ENV'):
+        return os.getenv('RIPC_SERVER_ADDR')
     return None
 
 
@@ -115,14 +115,14 @@ def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address)
     """
 
     if not Path(socket_path).is_socket():
-        raise_msg = "Socket path {} is not a valid socket".format(socket_path)
+        raise_msg = f'Socket path {socket_path} is not a valid socket'
         raise RedisIpcExc(raise_msg)
 
     try:
         if not server_addr:
-            pool = ConnectionPool.from_url("unix://{}".format(socket_path))
+            pool = ConnectionPool.from_url(f'unix://{socket_path}')
         else:
-            pool = ConnectionPool.from_url("redis://{}".format(server_addr))
+            pool = ConnectionPool.from_url(f'redis://{socket_path}')
         client = StrictRedis(connection_pool=pool)
 
     except (redis.exceptions.ConnectionError) as exc:
@@ -140,7 +140,7 @@ class RedisClient:
             allowing IPC from multiple threads in a multi-threaded program
     """
 
-    def __init__(self, component, thread="main"):
+    def __init__(self, component, thread='main'):
         self.component = component
         self.thread = thread
 
@@ -148,7 +148,7 @@ class RedisClient:
         self.process_number = os.getpid()
 
         # construct name of queue where replies to commands should arrive
-        self.results_queue = "queues.results.%s.%s" % (component, thread)
+        self.results_queue = f'queues.results.{component}.{thread}'
 
         # initialize redis connection
         self.redis_conn = redis_connect()
@@ -157,7 +157,7 @@ class RedisClient:
         # unique id for message
         # component name, process number, timestamp
         timestamp = str(time.time())  # floating timestamp
-        msg_id = self.component + ":" + str(self.process_number) + ":" + timestamp
+        msg_id = self.component + ':' + str(self.process_number) + ':' + timestamp
         return msg_id, timestamp
 
     def redis_ipc_send_and_receive(self, dest, cmd, tmout):
@@ -168,15 +168,15 @@ class RedisClient:
         """
         # add standard fields to the command dictionary
         late_news = self.__generate_msg_id()  # id and timestamp
-        cmd["timestamp"] = late_news[1]  # just the timestamp
-        cmd["component"] = self.component
-        cmd["thread"] = self.thread
-        cmd["tid"] = self.process_number
-        cmd["results_queue"] = self.results_queue
-        cmd["command_id"] = late_news[0]  # the id includes the timestamp
+        cmd['timestamp'] = late_news[1]  # just the timestamp
+        cmd['component'] = self.component
+        cmd['thread'] = self.thread
+        cmd['tid'] = self.process_number
+        cmd['results_queue'] = self.results_queue
+        cmd['command_id'] = late_news[0]  # the id includes the timestamp
 
         # calculate name of command queue
-        dest_queue = "queues.commands.%s" % dest
+        dest_queue = f'queues.commands.{dest}'
 
         # send off the command message  # still a Python dictionary
         self.__redis_ipc_send_command(dest_queue, cmd)
@@ -226,7 +226,7 @@ class RedisClient:
             if redis_reply is None:
                 raise MsgTimeout
             decoded_reply = jdic2pdic(redis_reply[1])
-            if decoded_reply["command_id"] != cmd["command_id"]:
+            if decoded_reply['command_id'] != cmd['command_id']:
                 continue  # skip this message, not our response
             # take it
             return decoded_reply  # good enough
@@ -247,7 +247,7 @@ class RedisServer:
         self.process_number = os.getpid()
 
         # construct name of queue where commands should arrive
-        self.command_queue = "queues.commands.%s" % component
+        self.command_queue = f'queues.commands.{component}'
 
         # initialize redis connection
         self.redis_conn = redis_connect()
@@ -273,10 +273,10 @@ class RedisServer:
         """
 
         # command contains name of reply queue
-        dest_queue = cmd["results_queue"]
+        dest_queue = cmd['results_queue']
 
         # tie reply to its command with matching command_id
-        result["command_id"] = cmd["command_id"]
+        result['command_id'] = cmd['command_id']
 
         # turn result into a JSON string before sending it
         msg = pdic2jdic(result)
