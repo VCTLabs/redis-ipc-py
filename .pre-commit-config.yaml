@@ -37,7 +37,7 @@ repos:
         args: ["-ll"]
         files: redis_ipc.py
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.11.0
+    rev: v2.11.1
     hooks:
       - id: pylint
         name: pylint
