@@ -115,14 +115,14 @@ def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address)
     """
 
     if not Path(socket_path).is_socket():
-        raise_msg = 'Socket path {} is not a valid socket'.format(socket_path)
+        raise_msg = f'Socket path {socket_path} is not a valid socket'
         raise RedisIpcExc(raise_msg)
 
     try:
         if not server_addr:
-            pool = ConnectionPool.from_url('unix://{}'.format(socket_path))
+            pool = ConnectionPool.from_url(f'unix://{socket_path}')
         else:
-            pool = ConnectionPool.from_url('redis://{}'.format(server_addr))
+            pool = ConnectionPool.from_url(f'redis://{socket_path}')
         client = StrictRedis(connection_pool=pool)
 
     except (redis.exceptions.ConnectionError) as exc:
@@ -148,7 +148,7 @@ class RedisClient:
         self.process_number = os.getpid()
 
         # construct name of queue where replies to commands should arrive
-        self.results_queue = 'queues.results.%s.%s' % (component, thread)
+        self.results_queue = f'queues.results.{component}.{thread}'
 
         # initialize redis connection
         self.redis_conn = redis_connect()
@@ -176,7 +176,7 @@ class RedisClient:
         cmd['command_id'] = late_news[0]  # the id includes the timestamp
 
         # calculate name of command queue
-        dest_queue = 'queues.commands.%s' % dest
+        dest_queue = f'queues.commands.{dest}'
 
         # send off the command message  # still a Python dictionary
         self.__redis_ipc_send_command(dest_queue, cmd)
@@ -247,7 +247,7 @@ class RedisServer:
         self.process_number = os.getpid()
 
         # construct name of queue where commands should arrive
-        self.command_queue = 'queues.commands.%s' % component
+        self.command_queue = f'queues.commands.{component}'
 
         # initialize redis connection
         self.redis_conn = redis_connect()
