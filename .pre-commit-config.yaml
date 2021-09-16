@@ -19,11 +19,12 @@ repos:
       - id: check-toml
       - id: check-yaml
         exclude: '.pep8speaks.yml'
-  - repo: https://github.com/psf/black
-    rev: 21.5b0
+  - repo: https://github.com/grktsh/ffffff
+    rev: v2020.8.31
     hooks:
-      - id: black
-        exclude: 'test_simple_bus.py'
+      - id: ffffff
+        language_version: python3
+        #exclude: 'test_simple_bus.py'
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:

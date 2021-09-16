@@ -4,7 +4,9 @@
 
 A small python module implementing redis-ipc concepts.
 
-|ci| |pylint| |bandit| |cov|
+|ci| |pylint| |bandit|
+
+|pre| |cov|
 
 |python| |tag| |license| |style|
 
@@ -248,6 +250,10 @@ remember to specify the socket path when running redis-cli ::
 .. |pylint| image:: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml/badge.svg
     :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml
     :alt: GitHub CI Pylint Status
+
+.. |pre| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+   :target: https://github.com/pre-commit/pre-commit
+   :alt: pre-commit
 
 .. |cov| image:: https://raw.githubusercontent.com/VCTLabs/redis-ipc-py/badges/develop/test-coverage.svg
     :target: https://github.com/VCTLabs/redis-ipc-py/
