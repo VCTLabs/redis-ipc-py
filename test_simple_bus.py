@@ -43,7 +43,7 @@ client_dbg = rc(components[0], channels[1])
 other = rc(components[1])
 
 msgs_json = [
-    "{\"msg_body\": \"Printer on fire!!\", \"severity\": 10}",
+    '{"msg_body": "Printer on fire!!", "severity": 10}',
 ]
 
 msgs_dict = [
@@ -57,25 +57,22 @@ test_msg = {
     'tid': 21969,
     'results_queue': 'queues.results.printer.main',
     'command_id': 'printer:22386:1631125926.771478',
-    'msg_body': 'Printer on fire!!'
+    'msg_body': 'Printer on fire!!',
 }
 
 bad_things = [
-    ("bad", "stuff"),
-    "{\"msg\": \"This is tricky\", \"severity\": float('nan')}",
+    ('bad', 'stuff'),
+    '{"msg": "This is tricky", "severity": float(\'nan\')}',
     {'really_bogus': True, 'extra_bogus': [Bogus['FOO'], Bogus['BAZ']]},
 ]
 
 sock_paths = [
-    "/tmp/redis-ipc/socket",
-    "/run/redis-ipc/socket",
-    "/run/sudo",
+    '/tmp/redis-ipc/socket',
+    '/run/redis-ipc/socket',
+    '/run/sudo',
 ]
 
-net_env_vars = {
-    'RIPC_TEST_ENV': 'true',
-    'RIPC_SERVER_ADDR': 'localhost'
-}
+net_env_vars = {'RIPC_TEST_ENV': 'true', 'RIPC_SERVER_ADDR': 'localhost'}
 
 test_only = {'RIPC_TEST_ENV': 'true'}
 
@@ -91,7 +88,7 @@ def test_get_serveraddr():
         assert get_serveraddr() is None
 
     with mock.patch.dict(os.environ, net_env_vars):
-        assert get_serveraddr() == "localhost"
+        assert get_serveraddr() == 'localhost'
 
 
 def test_redis_connect_no_socket():
@@ -99,18 +96,18 @@ def test_redis_connect_no_socket():
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         redis_connection = rconn(sock_paths[1])  # noqa
-    assert "socket is not a valid socket" in str(excinfo.value)
+    assert 'socket is not a valid socket' in str(excinfo.value)
 
 
 def test_redis_connect_with_addr():
     """ monkeypatch env vars and test with localhost """
     with mock.patch.dict(os.environ, net_env_vars):
         redis_connection = rconn(sock_paths[0], server_addr=get_serveraddr())
-        assert "localhost" in get_serveraddr()
+        assert 'localhost' in get_serveraddr()
 
         with pytest.raises(redis.exceptions.ConnectionError) as excinfo:
             redis_connection.info()
-        assert "Connection refused" in str(excinfo.value)
+        assert 'Connection refused' in str(excinfo.value)
 
 
 def test_jdic2pdic_excs():
@@ -121,7 +118,7 @@ def test_jdic2pdic_excs():
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         res = fromJson(bad_things[1])
-    assert "redis message was not a Python dictionary" in str(excinfo.value)
+    assert 'redis message was not a Python dictionary' in str(excinfo.value)
 
 
 def test_pdic2jdic_excs():
@@ -132,7 +129,7 @@ def test_pdic2jdic_excs():
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         res = toJson(bad_things[2])
-    assert "redis message not a recognizable message" in str(excinfo.value)
+    assert 'redis message not a recognizable message' in str(excinfo.value)
 
 
 def inject_side_msg_and_result(msg):
@@ -140,14 +137,14 @@ def inject_side_msg_and_result(msg):
 
     timestamp = str(time.time())
     pid = str(os.getpid())
-    msg_id = components[0] + ":" + pid + ":" + timestamp
+    msg_id = components[0] + ':' + pid + ':' + timestamp
 
-    msg["tid"] = pid
-    msg["timestamp"] = timestamp
-    msg["command_id"] = msg_id
+    msg['tid'] = pid
+    msg['timestamp'] = timestamp
+    msg['command_id'] = msg_id
 
-    res_queue = "queues.results.{}.{}".format(components[0], channels[0])
-    msg_queue = "queues.commands.{}".format(components[0])
+    res_queue = 'queues.results.{}.{}'.format(components[0], channels[0])
+    msg_queue = 'queues.commands.{}'.format(components[0])
 
     new_msg = toJson(msg)
     rconn(sock_paths[0]).rpush(msg_queue, new_msg)
@@ -179,16 +176,16 @@ def test_ipc_send_receive():
     res = client.redis_ipc_send_and_receive(components[0], {}, 1)
 
     assert isinstance(res, dict)
-    assert res["component"] == components[0]
-    assert res["thread"] == channels[0]
+    assert res['component'] == components[0]
+    assert res['thread'] == channels[0]
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         res_dbg = other.redis_ipc_send_and_receive(components[1], {}, 1)  # noqa
-    assert "redis message request timed out" in str(excinfo.value)
+    assert 'redis message request timed out' in str(excinfo.value)
 
     # cleanup stale msgs
     for component in components[1], components[0]:
-        cmd_queue = "queues.commands.{}".format(component)
+        cmd_queue = 'queues.commands.{}'.format(component)
         rconn(sock_paths[0]).blpop(cmd_queue, 1)
 
     proc.join()
