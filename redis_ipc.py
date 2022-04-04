@@ -28,7 +28,10 @@ __version__ = '0.0.1'
 
 # exceptions
 class RedisIpcExc(Exception):
-    pass
+    """
+    Generic redis-ipc error, used with one of the exception definitions
+    defined below.
+    """
 
 
 NoRedis = RedisIpcExc('redis server not available')
