@@ -164,7 +164,7 @@ jobs:
       env:
         VALUE: "Branch Rate"
       run: |
-        COVERAGE="$( cat code-coverage-results.txt | egrep "^${VALUE}" | sed -e 's#^.* \([0-9]*\)%.*#\1#' )"
+        COVERAGE="$( cat code-coverage-results.txt | grep -e ^Summary | grep -o -E "${VALUE} = .{3}" | egrep -o '([0-9]+)' )"
         echo "##[set-output name=coverage;]${COVERAGE}"
         echo "##[set-output name=coverage-rounded-display;]${COVERAGE}%"
 
