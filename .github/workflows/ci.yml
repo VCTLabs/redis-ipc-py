@@ -44,7 +44,7 @@ jobs:
         brew install redis
         brew services stop redis
 
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v3.1.1
       with:
         python-version: ${{ matrix.python-version }}
 
