@@ -133,7 +133,6 @@ def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address)
     return client
 
 
-# the main feature here is a class which will provide the wanted access
 class RedisClient:
     """
     component : friendly name for calling program
