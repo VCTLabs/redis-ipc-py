@@ -1,22 +1,19 @@
 import os
 import time
-
 from enum import Enum
 from multiprocessing import Process
 from unittest import mock
 
 import pytest
-
 import redis
+
 import redis_ipc
-
+from redis_ipc import RedisClient as rc
+from redis_ipc import RedisServer as rs
 from redis_ipc import get_serveraddr
-
 from redis_ipc import jdic2pdic as fromJson
 from redis_ipc import pdic2jdic as toJson
 from redis_ipc import redis_connect as rconn
-from redis_ipc import RedisServer as rs
-from redis_ipc import RedisClient as rc
 
 
 # bogus things

@@ -1,10 +1,9 @@
 # python development/tools requirements file
+bandit
+coverage[toml]
+coverage_python_version
+flake8
 pre-commit
 pylint
-bandit
-flake8
-pycodestyle
 pytest
 pytest-cov
-coverage
-coverage_python_version

@@ -1,6 +1,12 @@
-# internal coverage PR comment and badge v0.0.2
-# badge and comment job logic should be tuned for personal vs org use
-# (see badge job comments below)
+# internal coverage with PR comment and badge v0.0.5
+# Note this works for public orgs but only for "internal" pull
+# requests. In the case of fork PRs, there needs to be org-level
+# github app with private key => ACCESS_TOKEN, with more job isolation
+# and output passing in this workflow.
+#
+# This version has updated actions and coverage value regex, no fork isolation
+# yet. Badge and comment job logic should be tuned for personal vs org use
+# (fork PRs still needs the big refactor; see badge job comments below).
 name: Coverage
 
 on:
@@ -16,7 +22,7 @@ jobs:
     name: Prepare CI environment
     runs-on: ubuntu-20.04
     outputs:
-      commit_message: ${{ steps.get_commit_message.outputs.commit_message }}
+      #commit_message: ${{ steps.get_commit_message.outputs.commit_message }}
       branch: ${{ steps.extract_branch.outputs.branch }}
 
     steps:
@@ -30,13 +36,13 @@ jobs:
       run: |
         bash -c set
 
-    - name: "Get commit message"
-      id: get_commit_message
-      env:
-        COMMIT_PUSH: ${{ github.event.head_commit.message }}
-      run: |
-        COMMIT_MESSAGE="${COMMIT_PUSH:-$(git log --format=%B -n 1 HEAD^2)}"
-        echo "::set-output name=commit_message::${COMMIT_MESSAGE}"
+    #- name: "Get commit message"
+      #id: get_commit_message
+      #env:
+        #COMMIT_PUSH: ${{ github.event.head_commit.message }}
+      #run: |
+        #COMMIT_MESSAGE="${COMMIT_PUSH:-$(git log --format=%B -n 1 HEAD^2)}"
+        #echo "commit_message=${COMMIT_MESSAGE}" >> $GITHUB_OUTPUT
 
     - name: Extract branch name
       id: extract_branch
@@ -51,7 +57,7 @@ jobs:
         else
             EXPORT_VALUE="${TMP_GITHUB_REF}"
         fi
-        echo "##[set-output name=branch;]${EXPORT_VALUE}"
+        echo "branch=${EXPORT_VALUE}" >> $GITHUB_OUTPUT
 
   base:
     name: Base coverage
@@ -82,13 +88,13 @@ jobs:
         else
             EXPORT_VALUE="${TMP_GITHUB_REF}"
         fi
-        echo "##[set-output name=base_branch;]${EXPORT_VALUE}"
+        echo "base_branch=${EXPORT_VALUE}" >> $GITHUB_OUTPUT
         if [ -f "${EXPORT_VALUE}/${FILE}" ]
         then
             echo "Base coverage found on ${EXPORT_VALUE}"
             BASE_COV=$(cat "${EXPORT_VALUE}/${FILE}")
             echo "Base coverage is: ${BASE_COV}"
-            echo "##[set-output name=base_cov;]${BASE_COV}"
+            echo "base_cov=${BASE_COV}" >> $GITHUB_OUTPUT
         else
             echo "Base coverage NOT found on ${EXPORT_VALUE}!!"
         fi
@@ -102,12 +108,12 @@ jobs:
     - name: Check github variables
       # NOTE base coverage env var may be empty here
       env:
-        COMMIT_MESSAGE: ${{ needs.pre_ci.outputs.commit_message }}
+        #COMMIT_MESSAGE: ${{ needs.pre_ci.outputs.commit_message }}
         EXPORT_VALUE: ${{ needs.pre_ci.outputs.branch }}
         BASE_BRANCH: ${{ needs.base.outputs.base_branch }}
         BASE_COVERAGE: ${{ needs.base.outputs.base_cov }}
       run: |
-        echo "Commit message: ${COMMIT_MESSAGE}"
+        #echo "Commit message: ${COMMIT_MESSAGE}"
         echo "Export value (head_ref): ${EXPORT_VALUE}"
         echo "Base value (base_ref): ${BASE_BRANCH}"
         echo "Base coverage (percent): ${{ env.BASE_COVERAGE }}"
@@ -123,6 +129,8 @@ jobs:
       coverage: ${{ steps.coverage.outputs.coverage }}
       coverage-rounded-display: ${{ steps.coverage.outputs.coverage-rounded-display }}
     env:
+      PLATFORM: ubuntu-20.04
+      PYTHON: '3.10'
       PYTHONIOENCODING: utf-8
       PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
 
@@ -131,9 +139,9 @@ jobs:
       with:
         fetch-depth: 0
 
-    - uses: actions/setup-python@v4.0.0
+    - uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: ${{ env.PYTHON }}
 
     - name: Install redis (ubuntu)
       run: |
@@ -146,32 +154,41 @@ jobs:
         python -m pip install --upgrade pip
         pip install tox
 
-    - name: Generate coverage and fix pkg name
-      # another workaround for coverage.py missing package name
-      run: |
-        tox -e py39-cov-linux
+    - name: Setup old python for test
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.7
 
-    - name: Code Coverage Summary Report (Text & Value)
-      # use the fixed markdown until new upstream release
-      # uses: irongut/CodeCoverageSummary@v1.0.1
-      uses: joshjohanning/CodeCoverageSummary@v1.0.2
+    - name: Generate coverage
+      run: |
+        tox -e coverage,py37,py310
+
+    - name: Code Coverage Summary Report (data)
+      uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: coverage.xml
         output: 'both'
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: src_coverage_rpts
+        path: |
+          coverage.xml
+          code-coverage-results.txt
+        retention-days: 1
 
     - name: Check code coverage
       id: coverage
       env:
         VALUE: "Branch Rate"
       run: |
-        COVERAGE="$( cat code-coverage-results.txt | grep -e ^Summary | grep -o -E "${VALUE} = .{3}" | egrep -o '([0-9]+)' )"
-        echo "##[set-output name=coverage;]${COVERAGE}"
-        echo "##[set-output name=coverage-rounded-display;]${COVERAGE}%"
+        COVERAGE=$( cat code-coverage-results.txt | grep -e ^Summary | grep -o -E "${VALUE} = .{3}" | egrep -o '([0-9]+)' )
+        echo "coverage=${COVERAGE}" >> $GITHUB_OUTPUT
+        echo "coverage-rounded-display=${COVERAGE}%" >> $GITHUB_OUTPUT
+        echo "Current coverage is: ${COVERAGE}%"
 
     - name: Code Coverage Summary Report
-      # use the fixed markdown until new upstream release
-      # uses: irongut/CodeCoverageSummary@v1.0.1
-      uses: joshjohanning/CodeCoverageSummary@v1.0.2
+      uses: irongut/CodeCoverageSummary@v1.3.0
       if: ${{ github.event_name == 'pull_request' }}
       with:
         filename: coverage.xml
@@ -179,8 +196,8 @@ jobs:
         output: 'both'
 
     - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2.5.0
-      if: ${{ github.event_name == 'pull_request' }}
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request' && (github.event.pull_request.author_association == 'MEMBER' || github.actor == github.repository_owner)
       with:
         header: coverage
         recreate: true
@@ -201,10 +218,12 @@ jobs:
         COVERAGE: ${{ needs.cov_data.outputs.coverage }}
         COVERAGE_ROUNDED: ${{ needs.cov_data.outputs.coverage-rounded-display }}
         BASE_COVERAGE: ${{ needs.base.outputs.base_cov }}
+        MEMBER: ${{ github.event.pull_request.author_association }}
       run: |
         echo "Coverage: ${COVERAGE}"
         echo "Coverage Rounded: ${COVERAGE_ROUNDED}"
         echo "Coverage on Base Branch: ${BASE_COVERAGE}"
+        echo "Author assoc: ${MEMBER}"
 
   comment_cov_change:
     name: Comment on PR with coverage delta
@@ -264,12 +283,12 @@ jobs:
         if ! [ "${DELTA_WORD}" = "decrease" ]
         then
             echo "" >> coverage-delta.md
-            echo "Nice work, @${{ github.actor }}. Cheers! :rocket:" >> coverage-delta.md
+            echo "Nice work, @${{ github.actor }}. Cheers! :beers:" >> coverage-delta.md
         fi
 
     - name: Comment PR with test coverage delta
-      uses: marocchino/sticky-pull-request-comment@v2.5.0
-      if: env.HAVE_BASE_COVERAGE == 'true'
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: env.HAVE_BASE_COVERAGE == 'true' && (github.event.pull_request.author_association == 'MEMBER' || github.actor == github.repository_owner)
       with:
         header: delta
         recreate: true
@@ -279,16 +298,16 @@ jobs:
     # Only generate and publish if these conditions are met:
     # - The test step ended successfully
     # - One of these is met:
-    #   - This is a push event and the push event is on branch 'master' or 'develop'
+    #   - This is a push event and the push event is on branch 'main' or 'develop'
     # Note: if this repo is personal (ie, not an org repo) then you can
     #       use the following to change the scope of the next 2 jobs
     #       instead of running on branch push as shown below:
     #   - This is a pull request event and the pull actor is the same as the repo owner
-    #     if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/master' }}
+    #     if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/main' }}
     name: Generate badge image with test coverage value
     runs-on: ubuntu-20.04
     needs: [test, pre_ci]
-    if: ${{ github.event_name == 'push' }}
+    if: github.event_name == 'push'
     outputs:
       url: ${{ steps.url.outputs.url }}
       markdown: ${{ steps.url.outputs.markdown }}
@@ -301,10 +320,10 @@ jobs:
 
     # Use the output from the `coverage` step
     - name: Generate the badge SVG image
-      uses: emibcn/badge-action@v1
+      uses: emibcn/badge-action@v1.2.4
       id: badge
       with:
-        label: 'Coverage'
+        label: 'Branch Coverage'
         status: ${{ needs.test.outputs.coverage-rounded-display }}
         color: ${{
           needs.test.outputs.coverage > 90 && 'green'              ||
