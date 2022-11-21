@@ -7,18 +7,14 @@ a light-weight IPC mechanism using JSON formatting and the Redis server as
 'message bus'.
 """
 
-import os
-import time
 import json
+import os
 import tempfile
-
+import time
 from pathlib import Path
 
 import redis
-
-from redis import ConnectionPool
-from redis import StrictRedis
-
+from redis import ConnectionPool, StrictRedis
 
 __version__ = '0.0.1'
 
