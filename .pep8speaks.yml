@@ -15,4 +15,4 @@ exclude =
     src,
     inc,
 
-max-line-length = 84  # match .flake8 cfg file
+max-line-length = 90  # match .flake8 cfg file

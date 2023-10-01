@@ -1,8 +1,10 @@
 # python development/tools requirements file
 bandit
+black
 coverage[toml]
 coverage_python_version
 flake8
+isort
 pre-commit
 pylint
 pytest

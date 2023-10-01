@@ -39,7 +39,10 @@ MsgTimeout = RedisIpcExc('redis message request timed out')
 # module-level functions and variables
 def is_jsonable(obj):
     """
-    Test if obj can be dumped as JSON
+    Test if an object can be dumped as JSON.
+
+    :param obj: object to test
+    :return: True if dumpable else False
     """
     try:
         json.dumps(obj)
@@ -50,7 +53,10 @@ def is_jsonable(obj):
 
 def is_unjsonable(obj):
     """
-    Test if obj can be loaded as JSON
+    Test if an object can be loaded as JSON.
+
+    :param obj: object to test
+    :return: True if loadable else False
     """
     try:
         json.loads(obj)
@@ -61,9 +67,10 @@ def is_unjsonable(obj):
 
 def pdic2jdic(pdic):
     """
-    pdic    -    a Python dictionary
+    Covert an object to JSON.
 
-    returns a JSON string
+    :param pdic: a dictionary
+    :return: a JSON string
     """
     if not (is_jsonable(pdic) and isinstance(pdic, dict)):
         raise BadMessage
@@ -72,9 +79,10 @@ def pdic2jdic(pdic):
 
 def jdic2pdic(jstr):
     """
-    jstr    -    a JSON string which is a hash
+    Convert JSON to a dictionary, list, etc.
 
-    returns a Python dictionary
+    :param jstr: a JSON string
+    :return: an object
     """
     if not is_unjsonable(jstr):
         raise NotDict
@@ -85,7 +93,9 @@ def jdic2pdic(jstr):
 # environment
 def get_runtimepath():
     """
-    Get the runtime socket path
+    Get the runtime socket path.
+
+    :return: socket path string
     """
     temp_dir = tempfile.gettempdir()
     run_dir = os.getenv('RIPC_RUNTIME_DIR', temp_dir)
@@ -95,7 +105,9 @@ def get_runtimepath():
 def get_serveraddr():
     """
     Get the redis server address if defined in ENV (should be either
-    a resolvable hostname or ``localhost``)
+    a resolvable hostname or ``localhost``).
+
+    :return: address or None
     """
     if os.getenv('RIPC_TEST_ENV'):
         return os.getenv('RIPC_SERVER_ADDR')
@@ -108,9 +120,13 @@ ripc_server_address = get_serveraddr()
 
 def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address):
     """
-    attempt to open a connection to the Redis server
-    raise an exception if this does not work
-    return the connection object if it does work
+    Attempt to open a connection to the Redis server, and raise an exception
+    if this does not work. Return the connection object if successful.
+
+    :param socket_path: path to redis socket
+    :param server_addr: address of redis server
+    :return: client object
+    :raises: NoRedis
     """
 
     if not Path(socket_path).is_socket():
@@ -124,18 +140,19 @@ def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address)
             pool = ConnectionPool.from_url(f'redis://{socket_path}')
         client = StrictRedis(connection_pool=pool)
 
-    except (redis.exceptions.ConnectionError) as exc:
+    except redis.exceptions.ConnectionError as exc:
         raise NoRedis from exc
     return client
 
 
 class RedisClient:
     """
-    component : friendly name for calling program
-                (e.g. how it is labeled on system architecture diagrams
-                 as opposed to exact executable name)
-    thread: friendly name for specific thread of execution,
-            allowing IPC from multiple threads in a multi-threaded program
+    Provide a friendly component name for calling program (e.g. how it is
+    labeled on system architecture diagrams as opposed to exact executable
+    name). Allows IPC from multiple threads in a multi-threaded program.
+
+    :param component: name of component
+    :param thread: friendly name for specific thread of execution
     """
 
     def __init__(self, component, thread='main'):
@@ -160,9 +177,9 @@ class RedisClient:
 
     def redis_ipc_send_and_receive(self, dest, cmd, tmout):
         """
-        dest     -   name of the component to handle this command (string)
-        cmd      -   the command to send (must be a Python dictionary)
-        tmout    -   timeout for receiving a response, floating seconds
+        :param dest: name of the component to handle this command (string)
+        :param cmd: the command to send (dictionary)
+        :param tmout: timeout for receiving a response (float seconds)
         """
         # add standard fields to the command dictionary
         late_news = self.__generate_msg_id()  # id and timestamp
@@ -186,12 +203,11 @@ class RedisClient:
 
     def __redis_ipc_send_command(self, dest_queue, cmd):
         """
-        arguments are mandatory
-        dest_queue -   command queue serviced by destination component
-        cmd        -   a command known to the receiving component
+        This routine does not block, it just sends the command to the back
+        of the queue.
 
-        this routine does not block
-        it just sends the command to the back of the queue
+        :param dest_queue: command queue serviced by destination component
+        :param cmd: command known to the receiving component
         """
         # turn command into a JSON dictionary before sending it
         msg = pdic2jdic(cmd)
@@ -201,20 +217,18 @@ class RedisClient:
 
     def __redis_ipc_receive_reply(self, cmd, tmout):
         """
-        arguments are mandatory
-        cmd           - command for which we await a reply
-        tmout         - timeout for receiving a response, floating seconds
+        A proper response is a JSON string (dictionary), turn it back into
+        a dictionary. If the request timed out, the response is empty,
+        and an exception will be raised. if a non-empty value was received,
+        then::
 
-        a proper response is a JSON string (dictionary)
-        turn it into a Python dictionary
+            if it is not the response to the specified command
+               try again
+            else
+               return this result
 
-        if the request timed out, the response is empty,
-        and an exception will be raised if a non-empty value was received,
-        if it is not the response to the specified command
-           try again
-        else
-           return this result
-
+        :param cmd: command for which we await a reply
+        :param tmout: timeout for receiving a response (float seconds)
         """
 
         # use self.results_queue as name of queue to wait on
@@ -232,9 +246,11 @@ class RedisClient:
 
 class RedisServer:
     """
-    component : friendly name for calling program
-                (e.g. how it is labeled on system architecture diagrams
-                as opposed to exact executable name)
+    Provide a friendly component name for calling program (e.g. how it is
+    labeled on system architecture diagrams as opposed to exact executable
+    name).
+
+    :param component: name of component
     """
 
     def __init__(self, component):
@@ -252,8 +268,9 @@ class RedisServer:
 
     def redis_ipc_receive_command(self):
         """
-        blocks for command to arrive in own command queue,
-        return it as Python dictionary
+        Blocks for command string to arrive in own command queue.
+
+        :return: dictionary
         """
         # get serialized command message
         redis_reply = self.redis_conn.blpop(self.command_queue)
@@ -262,12 +279,11 @@ class RedisServer:
 
     def redis_ipc_send_reply(self, cmd, result):
         """
-        arguments are mandatory
-        cmd    - command that was processed so result is now available
-        result - the generated result
+        This routine does not block, it just sends the reply to the back
+        of the queue.
 
-        this routine does not block
-        it just sends the reply to the back of the queue
+        :param cmd: command that was processed so result is now available
+        :return result: the generated result
         """
 
         # command contains name of reply queue
