@@ -130,7 +130,7 @@ jobs:
       coverage-rounded-display: ${{ steps.coverage.outputs.coverage-rounded-display }}
     env:
       PLATFORM: ubuntu-20.04
-      PYTHON: '3.10'
+      PYTHON: '3.11'
       PYTHONIOENCODING: utf-8
       PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
 
@@ -161,7 +161,7 @@ jobs:
 
     - name: Generate coverage
       run: |
-        tox -e coverage,py37,py310
+        tox -e coverage,py37,py311
 
     - name: Code Coverage Summary Report (data)
       uses: irongut/CodeCoverageSummary@v1.3.0

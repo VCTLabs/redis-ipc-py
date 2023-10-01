@@ -1,6 +1,6 @@
-==============
- redis-ipc-py
-==============
+===============================
+ Python bindings for redis-ipc
+===============================
 
 A small python module implementing redis-ipc concepts.
 

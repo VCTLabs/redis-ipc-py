@@ -13,26 +13,25 @@
 import os
 import sys
 
-import pkg_resources
-
+if sys.version_info < (3, 8):
+    from importlib_metadata import version
+else:
+    from importlib.metadata import version
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 # needs an extra path here for namespace module-not-a-package
 # otherwise apidoc generates empty stub pages
-#sys.path.insert(0, os.path.abspath('../../'))
-
-__version__ = pkg_resources.get_distribution('redis_ipc').version
 
 # -- Project information -----------------------------------------------------
 
 project = 'redis_ipc'
-copyright = '2022, The redis_ipc Authors'
+copyright = '2023, The redis_ipc Authors'
 author = 'The redis_ipc Authors'
 
 # The full version, including alpha/beta/rc tags
-version = __version__
-release = version
-
+release = version('redis_ipc')
+# The short X.Y version.
+version = '.'.join(release.split('.')[:2])
 
 # -- General configuration ---------------------------------------------------
 
@@ -87,10 +86,10 @@ html_theme = 'sphinx_rtd_theme'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-html_show_copyright = False
+html_show_copyright = True
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'redis_ipcdoc'
