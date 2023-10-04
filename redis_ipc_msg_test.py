@@ -1,22 +1,19 @@
 import os
 import time
-
 from enum import Enum
 from multiprocessing import Process
 from unittest import mock
 
 import pytest
-
 import redis
+
 import redis_ipc
-
+from redis_ipc import RedisClient as rc
+from redis_ipc import RedisServer as rs
 from redis_ipc import get_serveraddr
-
 from redis_ipc import jdic2pdic as fromJson
 from redis_ipc import pdic2jdic as toJson
 from redis_ipc import redis_connect as rconn
-from redis_ipc import RedisServer as rs
-from redis_ipc import RedisClient as rc
 
 
 # bogus things
@@ -80,7 +77,7 @@ addr_only = {'RIPC_SERVER_ADDR': 'localhost'}
 
 
 def test_get_serveraddr():
-    """ monkeypatch env test """
+    """monkeypatch env test"""
     with mock.patch.dict(os.environ, test_only):
         assert get_serveraddr() is None
 
@@ -92,7 +89,7 @@ def test_get_serveraddr():
 
 
 def test_redis_connect_no_socket():
-    """ exception tests for bad socket path """
+    """exception tests for bad socket path"""
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
         redis_connection = rconn(sock_paths[1])  # noqa
@@ -100,7 +97,7 @@ def test_redis_connect_no_socket():
 
 
 def test_redis_connect_with_addr():
-    """ monkeypatch env vars and test with localhost """
+    """monkeypatch env vars and test with localhost"""
     with mock.patch.dict(os.environ, net_env_vars):
         redis_connection = rconn(sock_paths[0], server_addr=get_serveraddr())
         assert 'localhost' in get_serveraddr()
@@ -111,7 +108,7 @@ def test_redis_connect_with_addr():
 
 
 def test_jdic2pdic_excs():
-    """ exception tests for from-JSON function """
+    """exception tests for from-JSON function"""
 
     res = fromJson(msgs_json[0])
     assert res == msgs_dict[0]
@@ -122,7 +119,7 @@ def test_jdic2pdic_excs():
 
 
 def test_pdic2jdic_excs():
-    """ exception tests for to-JSON function """
+    """exception tests for to-JSON function"""
 
     res = toJson(msgs_dict[0])
     assert res == msgs_json[0]
@@ -133,7 +130,7 @@ def test_pdic2jdic_excs():
 
 
 def inject_side_msg_and_result(msg):
-    """ Generate ID and queue a side message for the client to ignore """
+    """Generate ID and queue a side message for the client to ignore"""
 
     timestamp = str(time.time())
     pid = str(os.getpid())
@@ -166,7 +163,7 @@ def echo_msg():
 
 
 def test_ipc_send_receive():
-    """ Test message bus using pytest and multiprocessing """
+    """Test message bus using pytest and multiprocessing"""
 
     # Start "server" process
     proc = Process(target=echo_msg)

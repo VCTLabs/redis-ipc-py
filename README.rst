@@ -1,6 +1,6 @@
-==============
- redis-ipc-py
-==============
+===============================
+ Python bindings for redis-ipc
+===============================
 
 A small python module implementing redis-ipc concepts.
 
@@ -38,7 +38,7 @@ Quick Start Dev Environment
 As there are not any Pypi packages available yet, you'll need to first
 clone this repository and then install locally (see below).
 
-.. note:: All dependencies are optional except `redis-py`.
+.. note:: All dependencies are optional except ``redis-py``.
 
 
 Dev Install
@@ -56,12 +56,12 @@ the tests (including style checkers and test coverage).
 
   $ git clone https://github.com/VCTLabs/redis-ipc-py
   $ cd redis-ipc-py
-  $ tox -e py<NN>-cov-<platform>
+  $ tox -e py<NN>-<platform>
 
 where <NN> is your local version of python, and <platform> is one of either
 ``linux`` or ``macos``, eg::
 
-  $ tox -e py38-cov-linux
+  $ tox -e py38-linux
 
 The above will run the default tox testenv, which includes the following:
 
@@ -76,11 +76,11 @@ The above will run the default tox testenv, which includes the following:
 
 Other tox environment arguments you can pass include:
 
-* ``tox -e build`` will build the python packages and run package checks
+* ``tox -e build,check`` will build the python packages and run package checks
 * ``tox -e style`` will run the ``flake8`` and ``pycodestyle`` (PEP8) style checks
 * ``tox -e lint`` will run ``pylint`` (somewhat less permissive than PEP8/flake8 checks)
-* ``tox -e black`` will run the ``black`` style checker
-* ``tox -e diff`` will run ``black --diff`` if the above has any issues
+* ``tox -e black`` will run the ``black`` formatter
+* ``tox -e mypy`` will run ``mypy`` type checking
 
 
 .. _tox: https://github.com/tox-dev/tox
@@ -179,7 +179,7 @@ socket and PID files, and setting the ``port`` to zero disables listening on
 any network interfaces.
 
 The above will also background the redis server, but you may need to hit
-<Enter> once to get the prompt back. Then type `python` in the source
+<Enter> once to get the prompt back. Then type ``python`` in the source
 directory in *2 separate terminal windows* and continue below.
 
 For example, to run from the source directory, start a client process from

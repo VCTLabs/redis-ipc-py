@@ -1,10 +1,11 @@
 # python development/tools requirements file
+bandit
+black
+coverage[toml]
+coverage_python_version
+flake8
+isort
 pre-commit
 pylint
-bandit
-flake8
-pycodestyle
 pytest
 pytest-cov
-coverage
-coverage_python_version
