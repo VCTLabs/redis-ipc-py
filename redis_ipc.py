@@ -9,23 +9,19 @@ a light-weight IPC mechanism using JSON formatting and the Redis server as
 
 import json
 import os
-import sys
 import tempfile
 import time
+from importlib.metadata import version
 from pathlib import Path
 
 import redis
 from redis import ConnectionPool, StrictRedis
 
-if sys.version_info < (3, 8):
-    from importlib_metadata import version
-else:
-    from importlib.metadata import version
-
-__version__ = version('redis_ipc')
-
 # instead of global pdb import, add this where you want to start debugger:
 # import pdb; pdb.set_trace()
+
+
+__version__ = version('redis_ipc')
 
 
 # exceptions
