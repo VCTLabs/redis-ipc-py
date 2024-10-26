@@ -6,7 +6,7 @@ A small python module implementing redis-ipc concepts.
 
 |ci| |pylint| |bandit|
 
-|pre| |cov|
+|pre| |cov| |contributors|
 
 |python| |tag| |license| |style|
 
@@ -278,3 +278,7 @@ remember to specify the socket path when running redis-cli ::
 .. |style| image:: https://img.shields.io/badge/Py%20code%20style-pylint-00000.svg
     :target: https://github.com/pycqa/pylint/
     :alt: Python Style
+
+.. |contributors| image:: https://img.shields.io/github/contributors/VCTLabs/redis-ipc-py
+   :target: https://github.com/VCTLabs/redis-ipc-py/
+   :alt: Contributors
