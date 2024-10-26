@@ -1,6 +1,11 @@
 [build-system]
-requires = ["setuptools>=40.8.0"]
+requires = [
+    "setuptools>=45",
+    "setuptools_scm[toml]>=6.2",
+]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
 
 [tool.coverage.run]
 branch = true
