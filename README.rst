@@ -1,6 +1,6 @@
-===============================
- Python bindings for redis-ipc
-===============================
+====================================
+ Python implementation of redis-ipc
+====================================
 
 A small python module implementing redis-ipc concepts.
 
@@ -10,24 +10,24 @@ A small python module implementing redis-ipc concepts.
 
 |python| |tag| |license| |style|
 
-redis-ipc is an example of how redis_ can be used as an advanced IPC
-mechanism on an embedded Linux system, for instance as a substitute for the
-more common choice of dbus.
+redis-ipc (the concept) comes in 2 flavors, a python module (this repo)
+and a lightweight C library implementation. See the (original)
+`redis-ipc C library`_ repo for a more detailed description.
 
-redis-ipc is intended to make communication among different logical components
-of a system convenient. It is not intended to replace shared memory for high
-data-rate transfers between processes, where lowest possible overhead is key,
-but to provide a convenient and reliable way to implement the following
-IPC mechanisms:
+``redis_ipc`` (the Python module) is an example of how redis_ can be used
+as an advanced IPC mechanism on an embedded Linux system, for instance
+as a substitute for the more common choice of dbus.
+
+``redis_ipc`` is intended to make communication among different logical
+components of a system convenient. It is not intended to replace shared
+memory for high data-rate transfers between processes, where lowest
+possible overhead is key, but to provide a convenient and reliable way
+to implement the following IPC mechanisms:
 
 * command queues
 * settings
 * status
 * event channels
-
-redis-ipc comes in 2 flavors, a python module (this repo) and a lightweight
-C library implementation. See the (original) `redis-ipc C library`_ repo for
-a more detailed description.
 
 .. _redis-ipc C library: https://github.com/VCTLabs/redis-ipc
 
