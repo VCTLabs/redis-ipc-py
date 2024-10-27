@@ -271,7 +271,7 @@ remember to specify the socket path when running redis-cli ::
     :target: https://github.com/VCTLabs/redis-ipc-py/releases
     :alt: GitHub tag (latest SemVer, including pre-release)
 
-.. |python| image:: https://img.shields.io/badge/python-3.6+-blue.svg
+.. |python| image:: https://img.shields.io/badge/python-3.8+-blue.svg
     :target: https://www.python.org/downloads/
     :alt: Python
 

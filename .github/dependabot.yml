@@ -8,8 +8,17 @@ updates:
       prefix: "python"
       include: "scope"
 
+  # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      # Check for updates to GitHub Actions every weekday
       interval: "daily"
+    commit-message:
+      prefix: "ci:"
+    labels: ["actions"]
+    # only needed for non-default branch
+    #target-branch: "develop"
+    ignore:
+      # Offical actions have moving tags like v1
+      # that are used, so they don't need updates here
+      - dependency-name: "actions/*"
