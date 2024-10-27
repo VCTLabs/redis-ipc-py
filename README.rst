@@ -264,7 +264,7 @@ remember to specify the socket path when running redis-cli ::
     :alt: Security check - Bandit
 
 .. |license| image:: https://badges.frapsoft.com/os/gpl/gpl.png?v=103
-    :target: https://opensource.org/licenses/GPL-2.0/
+    :target: https://github.com/VCTLabs/redis-ipc-py/blob/master/COPYING
     :alt: License
 
 .. |tag| image:: https://img.shields.io/github/v/tag/VCTLabs/redis-ipc-py?color=green&include_prereleases&label=latest%20release
