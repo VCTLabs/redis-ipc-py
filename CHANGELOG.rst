@@ -2,7 +2,21 @@ Changelog
 =========
 
 
-v0.1.0 (2024-10-27)
+v0.1.1 (2024-10-27)
+-------------------
+
+New
+~~~
+- Add docs build and deployment to release workflow. [Stephen Arnold]
+
+Changes
+~~~~~~~
+- Update changelog for patch release bump. [Stephen Arnold]
+- Cleanup workflow release page and re-generate changelog. [Stephen
+  Arnold]
+
+
+v0.1.0 (2024-10-26)
 -------------------
 
 New
