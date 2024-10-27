@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>redis_ipc module &mdash; redis_ipc 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="redis-ipc-py" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            redis_ipc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Python implementation of redis-ipc</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">redis-ipc-py</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">redis_ipc module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.RedisClient"><code class="docutils literal notranslate"><span class="pre">RedisClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#redis_ipc.RedisClient.redis_ipc_send_and_receive"><code class="docutils literal notranslate"><span class="pre">RedisClient.redis_ipc_send_and_receive()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.RedisIpcExc"><code class="docutils literal notranslate"><span class="pre">RedisIpcExc</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.RedisServer"><code class="docutils literal notranslate"><span class="pre">RedisServer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#redis_ipc.RedisServer.redis_ipc_receive_command"><code class="docutils literal notranslate"><span class="pre">RedisServer.redis_ipc_receive_command()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#redis_ipc.RedisServer.redis_ipc_send_reply"><code class="docutils literal notranslate"><span class="pre">RedisServer.redis_ipc_send_reply()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.get_runtimepath"><code class="docutils literal notranslate"><span class="pre">get_runtimepath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.get_serveraddr"><code class="docutils literal notranslate"><span class="pre">get_serveraddr()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.is_jsonable"><code class="docutils literal notranslate"><span class="pre">is_jsonable()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.is_unjsonable"><code class="docutils literal notranslate"><span class="pre">is_unjsonable()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.jdic2pdic"><code class="docutils literal notranslate"><span class="pre">jdic2pdic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.pdic2jdic"><code class="docutils literal notranslate"><span class="pre">pdic2jdic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#redis_ipc.redis_connect"><code class="docutils literal notranslate"><span class="pre">redis_connect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">redis_ipc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">redis-ipc-py</a></li>
+      <li class="breadcrumb-item active">redis_ipc module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/redis_ipc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-redis_ipc">
+<span id="redis-ipc-module"></span><h1>redis_ipc module<a class="headerlink" href="#module-redis_ipc" title="Link to this heading"></a></h1>
+<p>This is a Python module to provide ‘thin’ client/server classes implementing
+a light-weight IPC mechanism using JSON formatting and the Redis server as
+‘message bus’.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="redis_ipc.RedisClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">RedisClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'main'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#RedisClient"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisClient" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provide a friendly component name for calling program (e.g. how it is
+labeled on system architecture diagrams as opposed to exact executable
+name). Allows IPC from multiple threads in a multi-threaded program.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>component</strong> – name of component</p></li>
+<li><p><strong>thread</strong> – friendly name for specific thread of execution</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="redis_ipc.RedisClient.redis_ipc_send_and_receive">
+<span class="sig-name descname"><span class="pre">redis_ipc_send_and_receive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmout</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#RedisClient.redis_ipc_send_and_receive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisClient.redis_ipc_send_and_receive" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dest</strong> – name of the component to handle this command (string)</p></li>
+<li><p><strong>cmd</strong> – the command to send (dictionary)</p></li>
+<li><p><strong>tmout</strong> – timeout for receiving a response (float seconds)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="redis_ipc.RedisIpcExc">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">RedisIpcExc</span></span><a class="reference internal" href="../_modules/redis_ipc.html#RedisIpcExc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisIpcExc" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Generic redis-ipc error, used with one of the exception definitions
+defined below.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="redis_ipc.RedisServer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">RedisServer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">component</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#RedisServer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisServer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Provide a friendly component name for calling program (e.g. how it is
+labeled on system architecture diagrams as opposed to exact executable
+name).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>component</strong> – name of component</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="redis_ipc.RedisServer.redis_ipc_receive_command">
+<span class="sig-name descname"><span class="pre">redis_ipc_receive_command</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#RedisServer.redis_ipc_receive_command"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisServer.redis_ipc_receive_command" title="Link to this definition"></a></dt>
+<dd><p>Blocks for command string to arrive in own command queue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="redis_ipc.RedisServer.redis_ipc_send_reply">
+<span class="sig-name descname"><span class="pre">redis_ipc_send_reply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#RedisServer.redis_ipc_send_reply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.RedisServer.redis_ipc_send_reply" title="Link to this definition"></a></dt>
+<dd><p>This routine does not block, it just sends the reply to the back
+of the queue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cmd</strong> – command that was processed so result is now available</p>
+</dd>
+<dt class="field-even">Return result<span class="colon">:</span></dt>
+<dd class="field-even"><p>the generated result</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.get_runtimepath">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">get_runtimepath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#get_runtimepath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.get_runtimepath" title="Link to this definition"></a></dt>
+<dd><p>Get the runtime socket path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>socket path string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.get_serveraddr">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">get_serveraddr</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#get_serveraddr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.get_serveraddr" title="Link to this definition"></a></dt>
+<dd><p>Get the redis server address if defined in ENV (should be either
+a resolvable hostname or <code class="docutils literal notranslate"><span class="pre">localhost</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>address or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.is_jsonable">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">is_jsonable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#is_jsonable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.is_jsonable" title="Link to this definition"></a></dt>
+<dd><p>Test if an object can be dumped as JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – object to test</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if dumpable else False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.is_unjsonable">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">is_unjsonable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#is_unjsonable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.is_unjsonable" title="Link to this definition"></a></dt>
+<dd><p>Test if an object can be loaded as JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – object to test</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if loadable else False</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.jdic2pdic">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">jdic2pdic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">jstr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#jdic2pdic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.jdic2pdic" title="Link to this definition"></a></dt>
+<dd><p>Convert JSON to a dictionary, list, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>jstr</strong> – a JSON string</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.pdic2jdic">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">pdic2jdic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#pdic2jdic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.pdic2jdic" title="Link to this definition"></a></dt>
+<dd><p>Covert an object to JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdic</strong> – a dictionary</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a JSON string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="redis_ipc.redis_connect">
+<span class="sig-prename descclassname"><span class="pre">redis_ipc.</span></span><span class="sig-name descname"><span class="pre">redis_connect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">socket_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/tmp/redis-ipc/socket'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server_addr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/redis_ipc.html#redis_connect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#redis_ipc.redis_connect" title="Link to this definition"></a></dt>
+<dd><p>Attempt to open a connection to the Redis server, and raise an exception
+if this does not work. Return the connection object if successful.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>socket_path</strong> – path to redis socket</p></li>
+<li><p><strong>server_addr</strong> – address of redis server</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>client object</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>NoRedis</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="redis-ipc-py" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, The redis_ipc Authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

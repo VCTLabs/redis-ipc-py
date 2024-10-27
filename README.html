@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Python implementation of redis-ipc &mdash; redis_ipc 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="redis-ipc-py" href="api/modules.html" />
+    <link rel="prev" title="Welcome to redis_ipc’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            redis_ipc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Python implementation of redis-ipc</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-dev-environment">Quick Start Dev Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dev-install">Dev Install</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#standards-and-coding-style">Standards and Coding Style</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#usage-example">Usage Example</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#testing-with-tox">Testing With Tox</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#developer-mode">Developer Mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manual-example-steps">Manual Example Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#testing-troubleshooting">Testing | Troubleshooting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">redis-ipc-py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">redis_ipc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Python implementation of redis-ipc</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/README.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="python-implementation-of-redis-ipc">
+<h1>Python implementation of redis-ipc<a class="headerlink" href="#python-implementation-of-redis-ipc" title="Link to this heading"></a></h1>
+<p>A small python module implementing redis-ipc concepts.</p>
+<p><a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/ci.yml"><img alt="GitHub CI Smoke Test Status" src="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/ci.yml/badge.svg" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml"><img alt="GitHub CI Pylint Status" src="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml/badge.svg" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/bandit.yml"><img alt="Security check - Bandit" src="https://github.com/VCTLabs/redis-ipc-py/actions/workflows/bandit.yml/badge.svg" /></a></p>
+<p><a class="reference external" href="https://github.com/pre-commit/pre-commit"><img alt="pre-commit" src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/"><img alt="Test coverage" src="https://raw.githubusercontent.com/VCTLabs/redis-ipc-py/badges/develop/test-coverage.svg" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/"><img alt="Contributors" src="https://img.shields.io/github/contributors/VCTLabs/redis-ipc-py" /></a></p>
+<p><a class="reference external" href="https://www.python.org/downloads/"><img alt="Python" src="https://img.shields.io/badge/python-3.8+-blue.svg" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/releases"><img alt="GitHub tag (latest SemVer, including pre-release)" src="https://img.shields.io/github/v/tag/VCTLabs/redis-ipc-py?color=green&amp;include_prereleases&amp;label=latest%20release" /></a> <a class="reference external" href="https://github.com/VCTLabs/redis-ipc-py/blob/master/COPYING"><img alt="License" src="https://badges.frapsoft.com/os/gpl/gpl.png?v=103" /></a> <a class="reference external" href="https://github.com/pycqa/pylint/"><img alt="Python Style" src="https://img.shields.io/badge/Py%20code%20style-pylint-00000.svg" /></a></p>
+<p>redis-ipc (the concept) comes in 2 flavors, a python module (this repo)
+and a lightweight C library implementation. See the (original)
+<a class="reference external" href="https://github.com/VCTLabs/redis-ipc">redis-ipc C library</a> repo for a more detailed description.</p>
+<p><code class="docutils literal notranslate"><span class="pre">redis_ipc</span></code> (the Python module) is an example of how <a class="reference external" href="http://redis.io/">redis</a> can be used
+as an advanced IPC mechanism on an embedded Linux system, for instance
+as a substitute for the more common choice of dbus.</p>
+<p><code class="docutils literal notranslate"><span class="pre">redis_ipc</span></code> is intended to make communication among different logical
+components of a system convenient. It is not intended to replace shared
+memory for high data-rate transfers between processes, where lowest
+possible overhead is key, but to provide a convenient and reliable way
+to implement the following IPC mechanisms:</p>
+<ul class="simple">
+<li><p>command queues</p></li>
+<li><p>settings</p></li>
+<li><p>status</p></li>
+<li><p>event channels</p></li>
+</ul>
+<section id="quick-start-dev-environment">
+<h2>Quick Start Dev Environment<a class="headerlink" href="#quick-start-dev-environment" title="Link to this heading"></a></h2>
+<p>As there are not any Pypi packages available yet, you’ll need to first
+clone this repository and then install locally (see below).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All dependencies are optional except <code class="docutils literal notranslate"><span class="pre">redis-py</span></code>.</p>
+</div>
+<section id="dev-install">
+<h3>Dev Install<a class="headerlink" href="#dev-install" title="Link to this heading"></a></h3>
+<p>As long as you have git and at least Python 3.6, then the “easy” dev
+install is to clone this repository and install <a class="reference external" href="https://github.com/tox-dev/tox">tox</a>.</p>
+<p>After cloning the repository, you can run the current tests with the
+<code class="docutils literal notranslate"><span class="pre">tox</span></code> command.  It will build a virtual python environment for each
+installed version of python with all the python dependencies and run
+the tests (including style checkers and test coverage).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/VCTLabs/redis-ipc-py
+$ cd redis-ipc-py
+$ tox -e py&lt;NN&gt;-&lt;platform&gt;
+</pre></div>
+</div>
+<p>where &lt;NN&gt; is your local version of python, and &lt;platform&gt; is one of either
+<code class="docutils literal notranslate"><span class="pre">linux</span></code> or <code class="docutils literal notranslate"><span class="pre">macos</span></code>, eg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e py38-linux
+</pre></div>
+</div>
+<p>The above will run the default tox testenv, which includes the following:</p>
+<ul class="simple">
+<li><p>pre_test - install redis_ipc in tox env via <code class="docutils literal notranslate"><span class="pre">pip</span></code> and start the redis server</p></li>
+<li><p>test - run the simple msg bus send/receive tests with coverage</p></li>
+<li><p>post_test - stop the redis server</p></li>
+</ul>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The command above <strong>requires</strong> the installation of the full
+<code class="docutils literal notranslate"><span class="pre">redis</span></code> package (or at least <code class="docutils literal notranslate"><span class="pre">redis-server</span></code>).  See the <a class="reference internal" href="#usage-example">Usage Example</a>
+below for install instructions; you can still run the other tox commands
+without a full <code class="docutils literal notranslate"><span class="pre">redis</span></code> install.</p>
+</div>
+<p>Other tox environment arguments you can pass include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">build,check</span></code> will build the python packages and run package checks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">style</span></code> will run the <code class="docutils literal notranslate"><span class="pre">flake8</span></code> and <code class="docutils literal notranslate"><span class="pre">pycodestyle</span></code> (PEP8) style checks</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">lint</span></code> will run <code class="docutils literal notranslate"><span class="pre">pylint</span></code> (somewhat less permissive than PEP8/flake8 checks)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">black</span></code> will run the <code class="docutils literal notranslate"><span class="pre">black</span></code> formatter</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tox</span> <span class="pre">-e</span> <span class="pre">mypy</span></code> will run <code class="docutils literal notranslate"><span class="pre">mypy</span></code> type checking</p></li>
+</ul>
+</section>
+<section id="standards-and-coding-style">
+<h3>Standards and Coding Style<a class="headerlink" href="#standards-and-coding-style" title="Link to this heading"></a></h3>
+<p>Black style and both pep8 and flake8 are part of the above test suite.  There are also
+some CI pylint and bandit code analysis checks for complexity and security issues
+(we try to keep the “cognitive complexity” low when possible).</p>
+</section>
+</section>
+<section id="usage-example">
+<h2>Usage Example<a class="headerlink" href="#usage-example" title="Link to this heading"></a></h2>
+<p>This repository contains a python module implementation of redis-ipc client/server
+classes, and requires <code class="docutils literal notranslate"><span class="pre">redis-py</span></code> and a running <code class="docutils literal notranslate"><span class="pre">redis</span></code> server for full
+functionality. The easiest way to get started is really just “Try it and see…”
+so you’ll need to install and start a redis server first.</p>
+<p>Using your system package manager, install the redis server package for your
+platform:</p>
+<ul>
+<li><p>on Gentoo: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">emerge</span> <span class="pre">dev-db/redis</span> <span class="pre">dev-python/tox</span></code></p></li>
+<li><p>on Ubuntu: <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">redis-server</span></code></p></li>
+<li><p>on CentOS:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">epel</span><span class="o">-</span><span class="n">release</span>
+<span class="n">sudo</span> <span class="n">yum</span> <span class="n">update</span>
+<span class="n">sudo</span> <span class="n">yum</span> <span class="n">install</span> <span class="n">redis</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>On almost everything except Gentoo you should stop the system service
+before proceeding:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">systemctl</span> <span class="n">stop</span> <span class="n">redis</span>
+</pre></div>
+</div>
+<p>If your distro doesn’t currently package <code class="docutils literal notranslate"><span class="pre">tox</span></code>, first complain (consider filing
+a “missing package” bug) and then use <code class="docutils literal notranslate"><span class="pre">pip</span></code> to install it into your usual python
+environment.</p>
+<section id="testing-with-tox">
+<h3>Testing With Tox<a class="headerlink" href="#testing-with-tox" title="Link to this heading"></a></h3>
+<p>Once you have a <code class="docutils literal notranslate"><span class="pre">redis-server</span></code> installed, you can simply run the above
+<code class="docutils literal notranslate"><span class="pre">tox</span></code> command to manage the redis server component and run the tests
+for your local python version and OS platform, ie:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ tox -e py38-cov-macos
+</pre></div>
+</div>
+<p>The following section illustrates the (approximate) manual test steps run
+by the above command.</p>
+</section>
+<section id="developer-mode">
+<h3>Developer Mode<a class="headerlink" href="#developer-mode" title="Link to this heading"></a></h3>
+<p>To manually control <code class="docutils literal notranslate"><span class="pre">redis-server</span></code> and monitor the traffic on redis, use
+a workflow something like this. starting from the project source directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./scripts/run_redis.sh start
+</pre></div>
+</div>
+<p>Open another terminal window and start the monitor:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ redis-cli -s /tmp/redis-ipc/socket monitor
+</pre></div>
+</div>
+<p>From the first terminal window, run the (alternate) tests target:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$  tox -e tests
+</pre></div>
+</div>
+<p>Observe both terminals; the tests should complete successfully with the
+test data cleared from redis, so executing the tests several times should
+all succeed.  To manually clear all data from redis, simply stop and
+start the server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ ./scripts/run_redis.sh stop
+$ ./scripts/run_redis.sh start
+</pre></div>
+</div>
+</section>
+<section id="manual-example-steps">
+<h3>Manual Example Steps<a class="headerlink" href="#manual-example-steps" title="Link to this heading"></a></h3>
+<p>From the repository directory, you should either add “.” to your PYTHON_PATH
+or copy the python module to <code class="docutils literal notranslate"><span class="pre">site-packages</span></code>; for this example you can use
+the command shown below.</p>
+<p>To start a local redis server first, run the following <em>before</em> you start
+the python interpreter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /tmp/redis-ipc
+$ redis-server --port 0 --pidfile /tmp/redis.pid --unixsocket /tmp/redis-ipc/socket --unixsocketperm 600 &amp;
+$ redis-cli -s /tmp/redis-ipc/socket config set save &quot;&quot;  # disable dump.rdb saving
+</pre></div>
+</div>
+<p>The above command will use your local temp directory and permissions for the
+socket and PID files, and setting the <code class="docutils literal notranslate"><span class="pre">port</span></code> to zero disables listening on
+any network interfaces.</p>
+<p>The above will also background the redis server, but you may need to hit
+&lt;Enter&gt; once to get the prompt back. Then type <code class="docutils literal notranslate"><span class="pre">python</span></code> in the source
+directory in <em>2 separate terminal windows</em> and continue below.</p>
+<p>For example, to run from the source directory, start a client process from
+the first terminal:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">redis_ipc</span> <span class="kn">import</span> <span class="n">RedisClient</span> <span class="k">as</span> <span class="n">rc</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myClient</span> <span class="o">=</span> <span class="n">rc</span><span class="p">(</span><span class="s2">&quot;my_component&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myClient</span><span class="o">.</span><span class="n">redis_ipc_send_and_receive</span><span class="p">(</span><span class="s2">&quot;my_component&quot;</span><span class="p">,</span> <span class="p">{},</span> <span class="mi">30</span><span class="p">)</span>
+<span class="go">{&#39;timestamp&#39;: &#39;1627166512.0108066&#39;, &#39;component&#39;: &#39;my_component&#39;, &#39;thread&#39;: &#39;main&#39;, &#39;tid&#39;: 24544, &#39;results_queue&#39;: &#39;queues.results.my_component.main&#39;, &#39;command_id&#39;: &#39;my_component:24544:1627166512.0108066&#39;}</span>
+</pre></div>
+</div>
+<p>Then from a second terminal, start a server process:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">redis_ipc</span> <span class="kn">import</span> <span class="n">RedisServer</span> <span class="k">as</span> <span class="n">rs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myServer</span> <span class="o">=</span> <span class="n">rs</span><span class="p">(</span><span class="s2">&quot;my_component&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">myServer</span><span class="o">.</span><span class="n">redis_ipc_receive_command</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myServer</span><span class="o">.</span><span class="n">redis_ipc_send_reply</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that client side of the above will block for the timeout period (30 sec in
+this example) while waiting for the other side to send/reply, so run the server
+commands in less than 30 sec. or increase the timeout value on the client.</p>
+<p>If there is no running redis server, then you will get the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">redis_ipc</span> <span class="kn">import</span> <span class="n">RedisServer</span> <span class="k">as</span> <span class="n">rs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">myServer</span> <span class="o">=</span> <span class="n">rs</span><span class="p">(</span><span class="s2">&quot;my_component&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">myServer</span><span class="o">.</span><span class="n">redis_ipc_receive_command</span><span class="p">()</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">redis.exceptions.ConnectionError</span>: <span class="n">Error 2 connecting to unix socket: /tmp/redis-ipc/socket. No such file or directory.</span>
+</pre></div>
+</div>
+<p>When finished with the above, don’t forget to kill the redis server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat /tmp/redis.pid | xargs kill
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing-troubleshooting">
+<h2>Testing | Troubleshooting<a class="headerlink" href="#testing-troubleshooting" title="Link to this heading"></a></h2>
+<p>One of the great features of using redis for system-wide IPC is the ability
+to watch the interactions between components using the <strong>monitor</strong> command
+from redis-cli utility. Another great use is in unit testing of a single
+component, where a test script can push commands, update settings, check
+status and so forth. For both reasons it is useful to understand how each
+feature is implemented as redis data structures.</p>
+<p>&#64;&#64;&#64;TODO</p>
+<p>Since redis-ipc requires the redis server to use a unix socket rather than tcp,
+remember to specify the socket path when running redis-cli</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">redis</span><span class="o">-</span><span class="n">cli</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">redis</span><span class="o">-</span><span class="n">ipc</span><span class="o">/</span><span class="n">socket</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to redis_ipc’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/modules.html" class="btn btn-neutral float-right" title="redis-ipc-py" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, The redis_ipc Authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

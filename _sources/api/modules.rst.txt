@@ -1,0 +1,7 @@
+redis-ipc-py
+============
+
+.. toctree::
+   :maxdepth: 4
+
+   redis_ipc

@@ -1,0 +1,7 @@
+redis\_ipc module
+=================
+
+.. automodule:: redis_ipc
+   :members:
+   :undoc-members:
+   :show-inheritance:

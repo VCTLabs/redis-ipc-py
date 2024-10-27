@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>redis_ipc &mdash; redis_ipc 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            redis_ipc
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../README.html">Python implementation of redis-ipc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/modules.html">redis-ipc-py</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">redis_ipc</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">redis_ipc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for redis_ipc</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2011-2021 Vanguard Computer Technology Labs &lt;answers@vctlabs.com&gt;</span>
+<span class="c1">#</span>
+<span class="c1"># SPDX-License-Identifier: GPL-2.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This is a Python module to provide &#39;thin&#39; client/server classes implementing</span>
+<span class="sd">a light-weight IPC mechanism using JSON formatting and the Redis server as</span>
+<span class="sd">&#39;message bus&#39;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">importlib.metadata</span> <span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">redis</span>
+<span class="kn">from</span> <span class="nn">redis</span> <span class="kn">import</span> <span class="n">ConnectionPool</span><span class="p">,</span> <span class="n">StrictRedis</span>
+
+<span class="c1"># instead of global pdb import, add this where you want to start debugger:</span>
+<span class="c1"># import pdb; pdb.set_trace()</span>
+
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">version</span><span class="p">(</span><span class="s1">&#39;redis_ipc&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># exceptions</span>
+<div class="viewcode-block" id="RedisIpcExc">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisIpcExc">[docs]</a>
+<span class="k">class</span> <span class="nc">RedisIpcExc</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic redis-ipc error, used with one of the exception definitions</span>
+<span class="sd">    defined below.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<span class="n">NoRedis</span> <span class="o">=</span> <span class="n">RedisIpcExc</span><span class="p">(</span><span class="s1">&#39;redis server not available&#39;</span><span class="p">)</span>
+<span class="n">NotDict</span> <span class="o">=</span> <span class="n">RedisIpcExc</span><span class="p">(</span><span class="s1">&#39;redis message was not a Python dictionary&#39;</span><span class="p">)</span>
+<span class="n">BadMessage</span> <span class="o">=</span> <span class="n">RedisIpcExc</span><span class="p">(</span><span class="s1">&#39;redis message not a recognizable message&#39;</span><span class="p">)</span>
+<span class="n">MsgTimeout</span> <span class="o">=</span> <span class="n">RedisIpcExc</span><span class="p">(</span><span class="s1">&#39;redis message request timed out&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># module-level functions and variables</span>
+<div class="viewcode-block" id="is_jsonable">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.is_jsonable">[docs]</a>
+<span class="k">def</span> <span class="nf">is_jsonable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test if an object can be dumped as JSON.</span>
+
+<span class="sd">    :param obj: object to test</span>
+<span class="sd">    :return: True if dumpable else False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">OverflowError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="is_unjsonable">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.is_unjsonable">[docs]</a>
+<span class="k">def</span> <span class="nf">is_unjsonable</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Test if an object can be loaded as JSON.</span>
+
+<span class="sd">    :param obj: object to test</span>
+<span class="sd">    :return: True if loadable else False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="pdic2jdic">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.pdic2jdic">[docs]</a>
+<span class="k">def</span> <span class="nf">pdic2jdic</span><span class="p">(</span><span class="n">pdic</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Covert an object to JSON.</span>
+
+<span class="sd">    :param pdic: a dictionary</span>
+<span class="sd">    :return: a JSON string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_jsonable</span><span class="p">(</span><span class="n">pdic</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdic</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">BadMessage</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">pdic</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="jdic2pdic">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.jdic2pdic">[docs]</a>
+<span class="k">def</span> <span class="nf">jdic2pdic</span><span class="p">(</span><span class="n">jstr</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert JSON to a dictionary, list, etc.</span>
+
+<span class="sd">    :param jstr: a JSON string</span>
+<span class="sd">    :return: an object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_unjsonable</span><span class="p">(</span><span class="n">jstr</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">NotDict</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jstr</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># default socket path or address should only be used in a trusted/isolated</span>
+<span class="c1"># environment</span>
+<div class="viewcode-block" id="get_runtimepath">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.get_runtimepath">[docs]</a>
+<span class="k">def</span> <span class="nf">get_runtimepath</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the runtime socket path.</span>
+
+<span class="sd">    :return: socket path string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">temp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+    <span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RIPC_RUNTIME_DIR&#39;</span><span class="p">,</span> <span class="n">temp_dir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">run_dir</span><span class="p">,</span> <span class="s1">&#39;redis-ipc&#39;</span><span class="p">,</span> <span class="s1">&#39;socket&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_serveraddr">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.get_serveraddr">[docs]</a>
+<span class="k">def</span> <span class="nf">get_serveraddr</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the redis server address if defined in ENV (should be either</span>
+<span class="sd">    a resolvable hostname or ``localhost``).</span>
+
+<span class="sd">    :return: address or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RIPC_TEST_ENV&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;RIPC_SERVER_ADDR&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<span class="n">ripc_socket_path</span> <span class="o">=</span> <span class="n">get_runtimepath</span><span class="p">()</span>
+<span class="n">ripc_server_address</span> <span class="o">=</span> <span class="n">get_serveraddr</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="redis_connect">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.redis_connect">[docs]</a>
+<span class="k">def</span> <span class="nf">redis_connect</span><span class="p">(</span><span class="n">socket_path</span><span class="o">=</span><span class="n">ripc_socket_path</span><span class="p">,</span> <span class="n">server_addr</span><span class="o">=</span><span class="n">ripc_server_address</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempt to open a connection to the Redis server, and raise an exception</span>
+<span class="sd">    if this does not work. Return the connection object if successful.</span>
+
+<span class="sd">    :param socket_path: path to redis socket</span>
+<span class="sd">    :param server_addr: address of redis server</span>
+<span class="sd">    :return: client object</span>
+<span class="sd">    :raises: NoRedis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">socket_path</span><span class="p">)</span><span class="o">.</span><span class="n">is_socket</span><span class="p">():</span>
+        <span class="n">raise_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Socket path </span><span class="si">{</span><span class="n">socket_path</span><span class="si">}</span><span class="s1"> is not a valid socket&#39;</span>
+        <span class="k">raise</span> <span class="n">RedisIpcExc</span><span class="p">(</span><span class="n">raise_msg</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">server_addr</span><span class="p">:</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unix://</span><span class="si">{</span><span class="n">socket_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pool</span> <span class="o">=</span> <span class="n">ConnectionPool</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;redis://</span><span class="si">{</span><span class="n">socket_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">StrictRedis</span><span class="p">(</span><span class="n">connection_pool</span><span class="o">=</span><span class="n">pool</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ConnectionError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoRedis</span> <span class="kn">from</span> <span class="nn">exc</span>
+    <span class="k">return</span> <span class="n">client</span></div>
+
+
+
+<div class="viewcode-block" id="RedisClient">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisClient">[docs]</a>
+<span class="k">class</span> <span class="nc">RedisClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a friendly component name for calling program (e.g. how it is</span>
+<span class="sd">    labeled on system architecture diagrams as opposed to exact executable</span>
+<span class="sd">    name). Allows IPC from multiple threads in a multi-threaded program.</span>
+
+<span class="sd">    :param component: name of component</span>
+<span class="sd">    :param thread: friendly name for specific thread of execution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">thread</span><span class="o">=</span><span class="s1">&#39;main&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">component</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread</span> <span class="o">=</span> <span class="n">thread</span>
+
+        <span class="c1"># process number of this component (a python program)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_number</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+
+        <span class="c1"># construct name of queue where replies to commands should arrive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_queue</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;queues.results.</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">thread</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># initialize redis connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span> <span class="o">=</span> <span class="n">redis_connect</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__generate_msg_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># unique id for message</span>
+        <span class="c1"># component name, process number, timestamp</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>  <span class="c1"># floating timestamp</span>
+        <span class="n">msg_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_number</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">timestamp</span>
+        <span class="k">return</span> <span class="n">msg_id</span><span class="p">,</span> <span class="n">timestamp</span>
+
+<div class="viewcode-block" id="RedisClient.redis_ipc_send_and_receive">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisClient.redis_ipc_send_and_receive">[docs]</a>
+    <span class="k">def</span> <span class="nf">redis_ipc_send_and_receive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">tmout</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param dest: name of the component to handle this command (string)</span>
+<span class="sd">        :param cmd: the command to send (dictionary)</span>
+<span class="sd">        :param tmout: timeout for receiving a response (float seconds)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># add standard fields to the command dictionary</span>
+        <span class="n">late_news</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_msg_id</span><span class="p">()</span>  <span class="c1"># id and timestamp</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">late_news</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># just the timestamp</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;component&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;thread&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;tid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_number</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;results_queue&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_queue</span>
+        <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;command_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">late_news</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># the id includes the timestamp</span>
+
+        <span class="c1"># calculate name of command queue</span>
+        <span class="n">dest_queue</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;queues.commands.</span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># send off the command message  # still a Python dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__redis_ipc_send_command</span><span class="p">(</span><span class="n">dest_queue</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+
+        <span class="c1"># wait on results queue for the answer</span>
+        <span class="c1"># an exception is raised by the request function if it times out</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__redis_ipc_receive_reply</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">tmout</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__redis_ipc_send_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dest_queue</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This routine does not block, it just sends the command to the back</span>
+<span class="sd">        of the queue.</span>
+
+<span class="sd">        :param dest_queue: command queue serviced by destination component</span>
+<span class="sd">        :param cmd: command known to the receiving component</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># turn command into a JSON dictionary before sending it</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">pdic2jdic</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+        <span class="c1"># send it via Redis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">dest_queue</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>  <span class="c1"># no waiting</span>
+
+    <span class="k">def</span> <span class="nf">__redis_ipc_receive_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">tmout</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A proper response is a JSON string (dictionary), turn it back into</span>
+<span class="sd">        a dictionary. If the request timed out, the response is empty,</span>
+<span class="sd">        and an exception will be raised. if a non-empty value was received,</span>
+<span class="sd">        then::</span>
+
+<span class="sd">            if it is not the response to the specified command</span>
+<span class="sd">               try again</span>
+<span class="sd">            else</span>
+<span class="sd">               return this result</span>
+
+<span class="sd">        :param cmd: command for which we await a reply</span>
+<span class="sd">        :param tmout: timeout for receiving a response (float seconds)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># use self.results_queue as name of queue to wait on</span>
+        <span class="c1"># throw out received messages until reply[&quot;command_id&quot;] == cmd[&quot;command_id&quot;]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">redis_reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results_queue</span><span class="p">,</span> <span class="n">tmout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">redis_reply</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MsgTimeout</span>
+            <span class="n">decoded_reply</span> <span class="o">=</span> <span class="n">jdic2pdic</span><span class="p">(</span><span class="n">redis_reply</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">decoded_reply</span><span class="p">[</span><span class="s1">&#39;command_id&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;command_id&#39;</span><span class="p">]:</span>
+                <span class="k">continue</span>  <span class="c1"># skip this message, not our response</span>
+            <span class="c1"># take it</span>
+            <span class="k">return</span> <span class="n">decoded_reply</span>  <span class="c1"># good enough</span></div>
+
+
+
+<div class="viewcode-block" id="RedisServer">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisServer">[docs]</a>
+<span class="k">class</span> <span class="nc">RedisServer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Provide a friendly component name for calling program (e.g. how it is</span>
+<span class="sd">    labeled on system architecture diagrams as opposed to exact executable</span>
+<span class="sd">    name).</span>
+
+<span class="sd">    :param component: name of component</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="c1"># global redis_connect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">component</span>
+
+        <span class="c1"># process number of this component (a python program)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_number</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+
+        <span class="c1"># construct name of queue where commands should arrive</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command_queue</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;queues.commands.</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="c1"># initialize redis connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span> <span class="o">=</span> <span class="n">redis_connect</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RedisServer.redis_ipc_receive_command">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisServer.redis_ipc_receive_command">[docs]</a>
+    <span class="k">def</span> <span class="nf">redis_ipc_receive_command</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Blocks for command string to arrive in own command queue.</span>
+
+<span class="sd">        :return: dictionary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get serialized command message</span>
+        <span class="n">redis_reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span><span class="o">.</span><span class="n">blpop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command_queue</span><span class="p">)</span>
+        <span class="n">decoded_reply</span> <span class="o">=</span> <span class="n">jdic2pdic</span><span class="p">(</span><span class="n">redis_reply</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">decoded_reply</span></div>
+
+
+<div class="viewcode-block" id="RedisServer.redis_ipc_send_reply">
+<a class="viewcode-back" href="../api/redis_ipc.html#redis_ipc.RedisServer.redis_ipc_send_reply">[docs]</a>
+    <span class="k">def</span> <span class="nf">redis_ipc_send_reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This routine does not block, it just sends the reply to the back</span>
+<span class="sd">        of the queue.</span>
+
+<span class="sd">        :param cmd: command that was processed so result is now available</span>
+<span class="sd">        :return result: the generated result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># command contains name of reply queue</span>
+        <span class="n">dest_queue</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;results_queue&#39;</span><span class="p">]</span>
+
+        <span class="c1"># tie reply to its command with matching command_id</span>
+        <span class="n">result</span><span class="p">[</span><span class="s1">&#39;command_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="s1">&#39;command_id&#39;</span><span class="p">]</span>
+
+        <span class="c1"># turn result into a JSON string before sending it</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">pdic2jdic</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># send it via Redis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis_conn</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="n">dest_queue</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, The redis_ipc Authors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
