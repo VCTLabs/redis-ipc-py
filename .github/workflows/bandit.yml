@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Run bandit
-      uses: VCTLabs/bandit-report-artifacts@v2
+      uses: VCTLabs/bandit-report-artifacts@v3
       with:
         project_path: redis_ipc.py
         config_file: pyproject.toml
