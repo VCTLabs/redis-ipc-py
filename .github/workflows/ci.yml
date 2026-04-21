@@ -22,11 +22,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-20.04, macos-latest]
-        python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
+        os: [ubuntu-22.04, macos-latest]
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13']
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -40,11 +40,10 @@ jobs:
     - name: Install redis (macos)
       if: runner.os == 'macOS'
       run: |
-        brew tap homebrew/services
         brew install redis
         brew services stop redis
 
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -68,8 +67,8 @@ jobs:
         tox -e build
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       if: matrix.python-version == 3.9 && runner.os == 'Linux'
       with:
         name: wheels
-        path: ./dist/*.whl
+        path: dist
