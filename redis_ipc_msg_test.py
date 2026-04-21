@@ -8,6 +8,7 @@ import pytest
 import redis
 
 import redis_ipc
+from redis_ipc import BadMessage, MsgTimeout, NoRedis, NotDict
 from redis_ipc import RedisClient as rc
 from redis_ipc import RedisServer as rs
 from redis_ipc import get_serveraddr
