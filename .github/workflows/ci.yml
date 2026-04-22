@@ -67,7 +67,7 @@ jobs:
         tox -e build
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       if: matrix.python-version == 3.9 && runner.os == 'Linux'
       with:
         name: wheels
