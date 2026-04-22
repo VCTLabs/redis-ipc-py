@@ -171,19 +171,19 @@ def test_ipc_send_receive():
     proc.start()
 
     # Test
-    res = client.redis_ipc_send_and_receive(components[0], {}, 1)
+    res = client.redis_ipc_send_and_receive(components[0], {}, 1.1)
 
     assert isinstance(res, dict)
     assert res['component'] == components[0]
     assert res['thread'] == channels[0]
 
     with pytest.raises(redis_ipc.RedisIpcExc) as excinfo:
-        res_dbg = other.redis_ipc_send_and_receive(components[1], {}, 1)  # noqa
+        res_dbg = other.redis_ipc_send_and_receive(components[1], {}, 1.0)  # noqa
     assert 'redis message request timed out' in str(excinfo.value)
 
     # cleanup stale msgs
     for component in components[1], components[0]:
         cmd_queue = 'queues.commands.{}'.format(component)
-        rconn(sock_paths[0]).blpop(cmd_queue, 1)
+        rconn(sock_paths[0]).blpop(cmd_queue, 1.0)
 
     proc.join()
