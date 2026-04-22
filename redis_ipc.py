@@ -140,7 +140,9 @@ def redis_connect(socket_path=ripc_socket_path, server_addr=ripc_server_address)
             pool = ConnectionPool.from_url(f'unix://{socket_path}')
         else:
             pool = ConnectionPool.from_url(f'redis://{socket_path}')
-        client = StrictRedis(connection_pool=pool)
+        client = StrictRedis(
+            connection_pool=pool, socket_connect_timeout=0.1, socket_timeout=10.0
+        )
 
     except redis.exceptions.ConnectionError as exc:
         raise NoRedis from exc
