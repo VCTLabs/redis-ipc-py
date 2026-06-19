@@ -29,7 +29,7 @@ jobs:
 
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         # We need to fetch with a depth of 2 for pull_request so we can do HEAD^2
         fetch-depth: 2
@@ -71,7 +71,7 @@ jobs:
       base_cov: ${{ steps.get_base.outputs.base_cov }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         ref: badges
         path: badges
@@ -144,7 +144,7 @@ jobs:
       PIP_DOWNLOAD_CACHE: ${{ github.workspace }}/../.pip_download_cache
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -327,7 +327,7 @@ jobs:
       markdown: ${{ steps.url.outputs.markdown }}
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
       with:
         ref: badges
         path: badges
@@ -369,7 +369,7 @@ jobs:
         git commit -m "Add/Update badge" || true
 
     - name: Push badge commit
-      uses: ad-m/github-push-action@4cc74773234f74829a8c21bc4d69dd4be9cfa599  # v1.1.0
+      uses: ad-m/github-push-action@881a6320fdb16eb5318c5054f31c218aec2b324c  # v1.3.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: badges
