@@ -171,7 +171,7 @@ def test_ipc_send_receive():
     proc.start()
 
     # Test
-    res = client.redis_ipc_send_and_receive(components[0], {}, 1.1)
+    res = client.redis_ipc_send_and_receive(components[0], {}, 1.2)
 
     assert isinstance(res, dict)
     assert res['component'] == components[0]
