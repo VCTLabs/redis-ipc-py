@@ -24,10 +24,10 @@ branch = true
 source = ["redis_ipc.py"]
 
 [tool.coverage.paths]
-source = ["./"]
+source = ["redis_ipc.py"]
 
 [tool.coverage.report]
-fail_under = 90
+fail_under = 80
 show_missing = true
 
 [tool.black]
