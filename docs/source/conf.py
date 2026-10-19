@@ -24,12 +24,12 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
 
 # -- Project information -----------------------------------------------------
 
-project = 'redis_ipc'
+project = 'redis_ipc_py'
 copyright = '2023, The redis_ipc Authors'
 author = 'The redis_ipc Authors'
 
 # The full version, including alpha/beta/rc tags
-release = version('redis_ipc')
+release = version('redis_ipc_py')
 # The short X.Y version.
 version = '.'.join(release.split('.')[:2])
 
@@ -92,20 +92,20 @@ html_theme = 'sphinx_rtd_theme'
 html_show_copyright = True
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'redis_ipcdoc'
+htmlhelp_basename = 'redis_ipc_pydoc'
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'redis_ipc.tex', 'redis\\_ipc Documentation',
+  (master_doc, 'redis_ipc_py.tex', 'redis\\_ipc Documentation',
    [author], 'manual'),
 ]
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'redis_ipc', 'redis\\_ipc Documentation',
+    (master_doc, 'redis_ipc_py', 'redis\\_ipc Documentation',
      [author], 1)
 ]
 
@@ -113,7 +113,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'redis_ipc', 'redis\\_ipc Documentation',
-   author, 'redis_ipc', 'A set of redis_ipc client server classes',
+  (master_doc, 'redis_ipc_py', 'redis\\_ipc Documentation',
+   author, 'redis_ipc_py', 'A set of redis_ipc client server classes',
    'Miscellaneous'),
 ]
