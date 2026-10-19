@@ -251,7 +251,7 @@ remember to specify the socket path when running redis-cli ::
     :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/pylint.yml
     :alt: GitHub CI Pylint Status
 
-.. |pre| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white
+.. |pre| image:: https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=yellow
    :target: https://github.com/pre-commit/pre-commit
    :alt: pre-commit
 
@@ -263,7 +263,7 @@ remember to specify the socket path when running redis-cli ::
     :target: https://github.com/VCTLabs/redis-ipc-py/actions/workflows/bandit.yml
     :alt: Security check - Bandit
 
-.. |license| image:: https://img.shields.io/github/license/VCTLabs/redis-ipc-py
+.. |license| image:: https://img.shields.io/github/license/VCTLabs/redis-ipc-py?cacheSeconds=360
     :target: https://github.com/VCTLabs/redis-ipc-py/blob/master/COPYING
     :alt: License
 
@@ -279,6 +279,6 @@ remember to specify the socket path when running redis-cli ::
     :target: https://github.com/pycqa/pylint/
     :alt: Python Style
 
-.. |contributors| image:: https://img.shields.io/github/contributors/VCTLabs/redis-ipc-py
+.. |contributors| image:: https://img.shields.io/github/contributors-anon/VCTLabs/redis-ipc-py?cacheSeconds=360
    :target: https://github.com/VCTLabs/redis-ipc-py/
    :alt: Contributors
